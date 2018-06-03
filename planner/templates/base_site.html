@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Adventurer's Portal{% endblock %}</title>
+  <!-- CSS reset -->
+  <link rel="stylesheet" href="{% static 'planner/css/reset.css' %}">
+
+  <!-- Bootstrap, JQuery -->
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+  <!-- Custom CSS -->
+  {% block custom_css %}
+  {% endblock %}
+</head>
+<body>
+{% block body_override %}
+  <div class="container-fluid">
+
+    {% block header %}
+    <header class="main-header row">
+      <div class=col>
+        <a href="{% url 'site-home' %}">Site Home Icon</a>
+      </div>
+      <div class=col>
+        <ul class="nav justify-content-end">
+        <li class="nav-item"><a href="#">Dashboard</a></li>
+        <li class="nav-item"><a href="{% url 'destination-list' %}">Destinations</a></li>
+        <li class="nav-item"><a href="{% url 'route-list' %}">Routes</a></li>
+        {% if user.is_authenticated %}
+        <li class="nav-item" ><a href="{% url 'profile-detail' %}">User Options ({{user.get_username}})</a></li>
+        {% endif %}
+      </ul>
+      </div>
+    </header>
+    {% endblock %}
+
+    {% block main_content %}{% endblock %}
+
+  </div>
+
+  {% block custom_js %}
+    {# Custom JS #}
+  {% endblock %}
+
+  {% block jquery %}
+    {# JQuery #}
+  {% endblock %}
+
+{% endblock %}
+</body>
+</html>

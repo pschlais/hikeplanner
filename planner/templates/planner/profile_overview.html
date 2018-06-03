@@ -1,0 +1,19 @@
+{% extends "layout_detail.html" %}
+
+{% load static %}
+
+{% block main_content %}
+<section class="row">
+  <section class="col">
+    <h1>Username:</h1>
+    <p>{{user.get_username}}</p>
+    <h1>Name:</h1>
+    <p>{{user.get_full_name}}</p>
+    <h1>Nearest City:</h1>
+    <p>{{user.profile.nearest_city.name}}</p>
+    <h1>Street Address:</h1>
+    <p>{{user.profile.street_line}}, {{user.profile.city_line}}</p>
+    <p><a href="{% url 'profile-update' %}">Edit Info</a></p>
+  </section>
+</section>
+{% endblock %}

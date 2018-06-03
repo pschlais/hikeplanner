@@ -1,0 +1,159 @@
+{% extends "layout_detail.html" %}
+
+{% load static %}
+
+
+
+{% block detail_custom_css %}
+<!--
+<link rel="stylesheet" href="{% static 'planner/css/route_detail.css' %}">
+-->
+{% endblock %}
+
+
+
+{% block sidebar_content %}
+  <div>
+    Buttons Here
+  </div>
+  <h3>Relevant Links</h3>
+  <ul>
+    <li><a href="#">Link 1</a></li>
+    <li><a href="#">Link 2</a></li>
+    <li><a href="#">User Links here</a></li>
+  </ul>
+  <h3>User Tags</h3>
+  <ul>
+    <li>Tag 1</li>
+    <li>Tag 2</li>
+  </ul>
+{% endblock %}
+
+
+{% block detail_title %}
+  <h1>{{route.name}}</h1>
+{% endblock %}
+
+
+{% block detail_stats %}
+  <table class="table">
+    <tr>
+      <th scope="row">Total Distance</th>
+      <td>{{route.total_distance | floatformat:1}} mi</td>
+    </tr>
+    <tr>
+      <th scope="row">Total Elevation Gain</th>
+      <td>{{route.gain | floatformat:"0"}} ft</td>
+    </tr>
+    <tr>
+      <th scope="row">Class Rating</th>
+      <td>{{route.class_rating}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Route Sequence</th>
+      <td>{{route.path_seq_expanded}}</td>
+    </tr>
+
+    <tr>
+      <th scope="row">Location</th>
+      <td>{{route.county.state}}<br>{{route.county.name}} County</td>
+    </tr>
+
+    <tr>
+      <th scope="row">Jurisdiction</th>
+      <td>{{route.jurisdiction}}<br>{{route.jurisdiction.governing_body}}</td>
+    </tr>
+  </table>
+{% endblock %}
+
+
+{% block detail_buttons %}
+  <a href="#" class="btn btn-secondary">Google Terrain</a>
+  <a href="#" class="btn btn-secondary">Google Satellite</a>
+  <a href="#" class="btn btn-secondary">CalTopo</a>
+  <a href="#" class="btn btn-secondary">NOAA Weather</a>
+{% endblock %}
+
+
+{% block detail_below_fold %}
+  <div class="row">
+    {% if route.description %}
+      <section class="col route-subsection">
+        <h2>Description</h2>
+        <p>{{route.description}}</p>
+      </section>
+    {% endif %}
+
+    <section class="col route-weather">
+      This is a placeholder for weather point forecast
+    </section>
+  </div>
+
+  <div class="row">
+    <section class="col route-trailhead">
+      {% with trailheads=route.trailhead.all %}
+
+        <h2>Trailhead{% if trailheads.count > 1 %}s{% endif %}</h2>
+
+        <ul>
+        {% for TH in trailheads %}
+          <li><a href="{{TH.get_absolute_url}}">{{TH.name}}</a></li>
+        {% endfor %}
+        </ul>
+
+      {% endwith %}
+    </section>
+  </div>
+
+
+  <div class="row">
+    <section class="col route-destinations">
+      {% with destinations=route.destination.all %}
+        <h2>Accessible Destinations ({{destinations | length}})</h2>
+
+        {% if destinations %}
+          <ul>
+          {% for dest in destinations %}
+            <li><a href="{{dest.get_absolute_url}}">{{dest.name}} ({{dest.dest_type_expanded}}), {{dest.elevation | floatformat:"0"}} ft</a></li>
+          {% endfor %}
+          </ul>
+        {% else %}
+          <p>There are no saved destinations accessed by this route.</p>
+        {% endif %}
+
+      {% endwith %}
+    </section>
+  </div>
+
+  <div class="row">
+    <section class="col dest-redtape">
+      <h2>Red Tape ({{route.jurisdiction}})</h2>
+      <table class="table">
+        <tr>
+          <th scope="row">Parking</th>
+          {% if route.jurisdiction.parking_info %}
+            <td>{{route.jurisdiction.parking_info}}</td>
+          {% else %}
+            <td>No information in database</td>
+          {% endif %}
+        </tr>
+        <tr>
+          <th scope="row">Camping</th>
+          {% if route.jurisdiction.camping_info %}
+            <td>{{route.jurisdiction.camping_info}}</td>
+          {% else %}
+            <td>No information in database</td>
+          {% endif %}
+        </tr>
+      </table>
+    </section>
+  </div>
+{% endblock %}
+
+
+{% block custom_js %}
+{% endblock %}
+
+{% block jquery %}
+{% endblock %}
+

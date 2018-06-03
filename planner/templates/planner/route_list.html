@@ -1,0 +1,10 @@
+{% extends "base_site.html" %}
+
+{% block main_content %}
+  <h1>Routes ({{route_list | length}})</h1>
+  <ul>
+    {% for route in route_list %}
+      <li><a href="{{route.get_absolute_url}}">{{route.name}}</a></li>
+    {% endfor %}
+  </ul>
+{% endblock %}

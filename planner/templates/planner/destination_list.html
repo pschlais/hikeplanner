@@ -1,0 +1,10 @@
+{% extends "base_site.html" %}
+
+{% block main_content %}
+<h1>Destinations ({{destination_list | length}})</h1>
+<ul>
+  {% for dest in destination_list %}
+  <li><a href="{{dest.get_absolute_url}}">{{dest.name}}</a></li>
+  {% endfor %}
+</ul>
+{% endblock %}

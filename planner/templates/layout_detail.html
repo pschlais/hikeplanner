@@ -1,0 +1,66 @@
+{% extends "base_site.html" %}
+
+{% load static %}
+
+
+
+{% block custom_css %}
+  <link rel="stylesheet" href="{% static 'planner/css/layout_detail.css' %}">
+  {% block detail_custom_css %}
+  {% endblock %}
+{% endblock %}
+
+
+{% block main_content %}
+<section class="row">
+
+  <section class="col-2 detail-sidebar">
+    {% block sidebar_content %}
+    <div>block sidebar_content</div>
+    {% endblock %}
+  </section>
+
+  <section class="col-10 detail-body">
+
+    <div class="row">
+      <section class="col detail-summary">
+        {% block detail_title %}
+        <h1>block detail_title</h1>
+        {% endblock %}
+
+        <div class="row">
+          <section class="col-8 detail-stats">
+            {% block detail_stats %}
+            <p>block detail_stats</p>
+            {% endblock %}
+          </section>
+
+          <section class="col-4 detail-buttons">
+            {% block detail_buttons %}
+            <p>block detail_buttons</p>
+            {% endblock %}
+          </section>
+        </div>
+      </section>
+      <section class="col detail-map-embed">
+        {% block detail_map_embed %}
+          <div>block detail_map_embed</div>
+        {% endblock %}
+      </section>
+    </div>
+
+
+    {% block detail_below_fold %}
+      <p>block detail_below_fold</p>
+    {% endblock %}
+
+  </section>
+
+</section>
+{% endblock %}
+
+{% block custom_js %}
+{% endblock %}
+
+{% block jquery %}
+{% endblock %}

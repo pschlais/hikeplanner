@@ -1,0 +1,139 @@
+{% extends "layout_detail.html" %}
+
+{% load static %}
+
+
+
+{% block detail_custom_css %}
+
+<link rel="stylesheet" href="{% static 'planner/css/destination_detail.css' %}">
+
+{% endblock %}
+
+
+
+{% block sidebar_content %}
+  <div>
+    Buttons Here
+  </div>
+  <h3>Relevant Links</h3>
+  <ul>
+    <li><a href="#">Link 1</a></li>
+    <li><a href="#">Link 2</a></li>
+    <li><a href="#">User Links here</a></li>
+  </ul>
+  <h3>User Tags</h3>
+  <ul>
+    <li>Tag 1</li>
+    <li>Tag 2</li>
+  </ul>
+{% endblock %}
+
+
+{% block detail_title %}
+  <h1>{{destination.name}}</h1>
+  <h2>{{destination.dest_type_expanded}}</h2>
+{% endblock %}
+
+
+{% block detail_stats %}
+  <table class="table">
+    <tr>
+      <th scope="row">Lat/Lon</th>
+      <td>{{destination.latitude}}, {{destination.longitude}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Elevation</th>
+      <td>{{destination.elevation | floatformat:"0"}} ft</td>
+    </tr>
+    <tr>
+      <th scope="row">Location</th>
+      <td>{{destination.county.state}}<br>{{destination.county.name}} County</td>
+    </tr>
+    <tr>
+      <th scope="row">Jurisdiction</th>
+      <td>{{destination.jurisdiction}}<br>{{destination.jurisdiction.governing_body}}</td>
+    </tr>
+  </table>
+{% endblock %}
+
+{% block detail_map_embed %}
+  <img src="{{destination.google_maps_embed_url}}">
+  {# <img src="{% static 'planner/img/staticmap.png' %}"> #}
+  <p><a href="{{destination.google_maps_embed_url}}">Destination static map</a></p>
+{% endblock %}
+
+
+{% block detail_buttons %}
+  <a href="{{destination.google_maps_terrain_url}}" class="btn btn-secondary" target="_blank">Google Terrain</a>
+  <a href="{{destination.google_maps_satellite_url}}" class="btn btn-secondary" target="_blank">Google Satellite</a>
+  <a href="{{destination.caltopo_url}}" class="btn btn-secondary" target="_blank">CalTopo</a>
+  <a href="{{destination.noaa_url}}" class="btn btn-secondary" target="_blank">NOAA Weather</a>
+{% endblock %}
+
+
+{% block detail_below_fold %}
+  <div class="row">
+    {% if destination.description %}
+    <section class="col dest-description">
+      <h2>Description</h2>
+      <p>{{destination.description}}</p>
+    </section>
+    {% endif %}
+
+    <section class="col dest-weather">
+      <iframe src="{{destination.noaa_embed_widget_url}}"></iframe>
+    </section>
+  </div>
+
+
+  <div class="row">
+    <section class="col dest-routes">
+      {% with routes=destination.route_set.all %}
+        <h2>Routes ({{routes | length}})</h2>
+
+        {% if routes %}
+          <ul>
+          {% for route in routes %}
+            <li><a href="{{route.get_absolute_url}}">{{route.name}}</a></li>
+          {% endfor %}
+          </ul>
+        {% else %}
+          <p>There are no saved routes accessing this destination.</p>
+        {% endif %}
+
+      {% endwith %}
+    </section>
+  </div>
+
+  <div class="row">
+    <section class="col dest-redtape">
+      <h2>Red Tape ({{destination.jurisdiction}})</h2>
+      <table class="table">
+        <tr>
+          <th scope="row">Parking</th>
+          {% if destination.jurisdiction.parking_info %}
+            <td>{{destination.jurisdiction.parking_info}}</td>
+          {% else %}
+            <td>No information in database</td>
+          {% endif %}
+        </tr>
+        <tr>
+          <th scope="row">Camping</th>
+          {% if destination.jurisdiction.camping_info %}
+            <td>{{destination.jurisdiction.camping_info}}</td>
+          {% else %}
+            <td>No information in database</td>
+          {% endif %}
+        </tr>
+      </table>
+    </section>
+  </div>
+{% endblock %}
+
+
+{% block custom_js %}
+{% endblock %}
+
+{% block jquery %}
+{% endblock %}

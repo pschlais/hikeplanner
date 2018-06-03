@@ -1,0 +1,15 @@
+{% extends "layout_detail.html" %}
+
+{% load static %}
+
+{% block main_content %}
+<section class="row">
+  <section class="col">
+    <form action="" method="post">
+      {% csrf_token %}
+      <table>{{form.as_table}}</table>
+      <input type="submit" value="Update" />
+    </form>
+  </section>
+</section>
+{% endblock %}

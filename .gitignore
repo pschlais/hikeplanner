@@ -1,0 +1,5 @@
+Sensitive_App_Info.txt
+db.sqlite3
+*.sublime*
+*/__pycache__/
+*/*/__pycache__/

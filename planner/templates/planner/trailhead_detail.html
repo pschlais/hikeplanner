@@ -1,0 +1,160 @@
+{% extends "layout_detail.html" %}
+
+{% load static %}
+
+
+
+{% block detail_custom_css %}
+
+<link rel="stylesheet" href="{% static 'planner/css/trailhead_detail.css' %}">
+
+{% endblock %}
+
+
+
+{% block sidebar_content %}
+  <div>
+    Buttons Here
+  </div>
+  <h3>Relevant Links</h3>
+  <ul>
+    <li><a href="#">Link 1</a></li>
+    <li><a href="#">Link 2</a></li>
+    <li><a href="#">User Links here</a></li>
+  </ul>
+{% endblock %}
+
+
+{% block detail_title %}
+  <h1>{{trailhead.name}}</h1>
+{% endblock %}
+
+
+{% block detail_stats %}
+  <table class="table">
+    <tr>
+      <th scope="row">Lat/Lon</th>
+      <td>{{trailhead.latitude}}, {{trailhead.longitude}}</td>
+    </tr>
+    <!-- placeholder for elevation in case it is ever added
+    <tr>
+      <th scope="row">Elevation</th>
+      <td>{{trailhead.elevation | floatformat:"0"}} ft</td>
+    </tr>
+    -->
+    <tr>
+      <th scope="row">Location</th>
+      <td>{{trailhead.county.state}}<br>{{trailhead.county.name}} County</td>
+    </tr>
+    <tr>
+      <th scope="row">Jurisdiction</th>
+      <td>{{trailhead.jurisdiction}}<br>{{trailhead.jurisdiction.governing_body}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Drive Distance</th>
+      <td>{{directions_api_distance}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Drive Time</th>
+      <td>{{directions_api_duration}}</td>
+    </tr>
+  </table>
+
+  {% if directions_api_status != "OK" %}
+  <div class="alert alert-danger">{{directions_api_message}}</div>
+  {% endif %}
+
+  <div><a id="TH-directions-button" href="{{directions_external_url}}" class="btn btn-primary">Open Driving Directions</a></div>
+  <p><a href="{{directions_api_url}}">Directions API call</a></p>
+
+{% endblock %}
+
+{% block detail_map_embed %}
+  <img src="{{trailhead.google_maps_embed_url}}">
+  {# <img src="{% static 'planner/img/staticmap.png' %}"> #}
+  <p><a href="{{trailhead.google_maps_embed_url}}">TH static map</a></p>
+{% endblock %}
+
+{% block detail_buttons %}
+  <a href="{{trailhead.google_maps_terrain_url}}" class="btn btn-secondary">Google Terrain</a>
+  <a href="{{trailhead.google_maps_satellite_url}}" class="btn btn-secondary">Google Satellite</a>
+  <a href="{{trailhead.caltopo_url}}" class="btn btn-secondary">CalTopo</a>
+  <a href="{{trailhead.noaa_url}}" class="btn btn-secondary">NOAA Weather</a>
+{% endblock %}
+
+
+{% block detail_below_fold %}
+  <div class="row">
+    <section class="col th-weather">
+      Weather forecast goes here
+      <!--
+      <img src="{{noaa_weather_data.icon}}">
+      <p>{{noaa_weather_data.name}}</p>
+      <p>{{noaa_weather_data.temperature}}{{noaa_weather_data.temperatureUnit}}</p>
+      <p>{{noaa_weather_data.shortForecast}}</p>
+      <p>{{noaa_weather_data.detailedForecast}}</p>
+    -->
+    </section>
+  </div>
+
+
+  <div class="row">
+    <section class="col dest-routes">
+      {% with routes=trailhead.route_set.all %}
+        <h2>Accessible Routes ({{routes | length}})</h2>
+
+        {% if routes %}
+          <ul>
+          {% for route in routes %}
+
+            {% with destinations=route.destination.all %}
+
+            <li><a href="{{route.get_absolute_url}}">{{route.name}}</a> {% if destinations %}
+              {% for dest in destinations %}
+                {% if forloop.first %}({% endif %}<a href="{{dest.get_absolute_url}}">{{dest.name}}</a>{% if not forloop.last %},{% else %}){% endif %}
+              {% endfor %}
+            {% endif %}</li>
+
+            {% endwith %}
+
+          {% endfor %}
+          </ul>
+        {% else %}
+          <p>There are no saved routes accessing this destination.</p>
+        {% endif %}
+
+      {% endwith %}
+    </section>
+  </div>
+
+  <div class="row">
+    <section class="col th-redtape">
+      <h2>Red Tape ({{trailhead.jurisdiction}})</h2>
+      <table class="table">
+        <tr>
+          <th scope="row">Parking</th>
+          {% if trailhead.jurisdiction.parking_info %}
+            <td>{{trailhead.jurisdiction.parking_info}}</td>
+          {% else %}
+            <td>No information in database</td>
+          {% endif %}
+        </tr>
+        <tr>
+          <th scope="row">Camping</th>
+          {% if trailhead.jurisdiction.camping_info %}
+            <td>{{trailhead.jurisdiction.camping_info}}</td>
+          {% else %}
+            <td>No information in database</td>
+          {% endif %}
+        </tr>
+      </table>
+    </section>
+  </div>
+{% endblock %}
+
+
+{% block custom_js %}
+{% endblock %}
+
+{% block jquery %}
+{% endblock %}
