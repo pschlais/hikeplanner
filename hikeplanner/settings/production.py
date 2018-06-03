@@ -6,6 +6,12 @@ from .base import *
 
 DEBUG = False
 
+MIDDLEWARE_CLASSES = (
+    # Simplified static file serving.
+    # https://warehouse.python.org/project/whitenoise/
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+                      )
+
 ALLOWED_HOSTS = [".herokuapp.com"]
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
