@@ -91,37 +91,22 @@
 
   <div class="row">
     <section class="col route-trailhead">
-      {% with trailheads=route.trailhead.all %}
-
-        <h2>Trailhead{% if trailheads.count > 1 %}s{% endif %}</h2>
-
-        <ul>
-        {% for TH in trailheads %}
-          <li><a href="{{TH.get_absolute_url}}">{{TH.name}}</a></li>
-        {% endfor %}
-        </ul>
-
-      {% endwith %}
+      <h2>Trailhead</h2>
+      <ul>
+        <li><a href="{{route.trailhead.get_absolute_url}}">{{route.trailhead.name}}</a></li>
+      </ul>
     </section>
   </div>
 
 
   <div class="row">
     <section class="col route-destinations">
-      {% with destinations=route.destination.all %}
-        <h2>Accessible Destinations ({{destinations | length}})</h2>
-
-        {% if destinations %}
+        <h2>Route Destination</h2>
+        {% with route.destination as dest %}
           <ul>
-          {% for dest in destinations %}
             <li><a href="{{dest.get_absolute_url}}">{{dest.name}} ({{dest.dest_type_expanded}}), {{dest.elevation | floatformat:"0"}} ft</a></li>
-          {% endfor %}
           </ul>
-        {% else %}
-          <p>There are no saved destinations accessed by this route.</p>
-        {% endif %}
-
-      {% endwith %}
+        {% endwith %}
     </section>
   </div>
 

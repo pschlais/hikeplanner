@@ -71,8 +71,12 @@ class Destination(models.Model):
         return constructURL.buildNOAAURL(self.latitude, self.longitude)
 
     @property
-    def noaa_embed_widget_url(self):
-        return constructURL.buildNOAAembedURL(self.latitude, self.longitude)
+    def noaa_api_url(self):
+        return constructURL.buildNOAAapiURL(self.latitude, self.longitude)
+
+    # @property
+    # def noaa_embed_widget_url(self):
+    #     return constructURL.buildNOAAembedURL(self.latitude, self.longitude)
 
     @property
     def google_maps_embed_url(self):
@@ -122,15 +126,15 @@ class Route(models.Model):
     gain = models.IntegerField(verbose_name='Total Elevation Gain [ft]')
     path_seq = models.CharField(max_length=3, choices=PATH_SEQ_CHOICES,
                                 verbose_name='Route Sequence')
-    trailhead = models.ManyToManyField('Trailhead')
+    trailhead = models.ForeignKey('Trailhead', on_delete=models.SET_NULL, null=True)
     class_rating = models.PositiveSmallIntegerField(choices=CLASS_RATING_CHOICES,
                                                     verbose_name="Class",
                                                     help_text="Yosemite Decimal System (1-5)")
     county = models.ForeignKey('County', on_delete=models.SET_NULL, null=True)
     jurisdiction = models.ForeignKey('Jurisdiction',on_delete=models.SET_NULL, null=True)
-    destination = models.ManyToManyField(Destination,
+    destination = models.ForeignKey(Destination,
                                          verbose_name="Accessible Destination(s)",
-                                         help_text="Destinations accessible by this route", blank=True)
+                                         help_text="Destinations accessible by this route", on_delete=models.CASCADE)
     description = models.TextField(max_length=5000, blank=True)
 
 

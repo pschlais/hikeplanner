@@ -9,6 +9,7 @@ from .models import Destination, Route, Trailhead, Profile
 from .forms import ProfileForm
 from .PlannerUtils import constructURL
 from .PlannerUtils import accessAPI
+from .PlannerUtils import parseAPI
 import json
 
 # Create your views here.
@@ -23,6 +24,19 @@ class DestinationListView(LoginRequiredMixin, generic.ListView):
 
 class DestinationDetailView(LoginRequiredMixin, generic.DetailView):
     model=Destination
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+
+        # call NOAA forecast API
+        noaa_api_url = self.object.noaa_api_url
+        context['noaa_api_url'] = noaa_api_url
+        weather_raw_data = accessAPI.NOAA_API(noaa_api_url)
+        weather_data_by_day = parseAPI.NOAA_by_day(weather_raw_data)
+        context['weather_by_day'] = weather_data_by_day
+
+        return context
 
 # ------- Route views ------------------------------
 class RouteListView(LoginRequiredMixin, generic.ListView):
@@ -57,10 +71,13 @@ class TrailheadDetailView(LoginRequiredMixin, generic.DetailView):
         context['directions_api_duration'] = distData["duration"]["text"]
         context['directions_api_distance'] = distData["distance"]["text"]
 
-        # # call NOAA forecast API
-        # noaa_api_url = self.object.noaa_api_url
-        # context['noaa_api_url'] = noaa_api_url
-        # weather_raw_data = accessAPI.NOAA_API(noaa_api_url)
+        # call NOAA forecast API
+        noaa_api_url = self.object.noaa_api_url
+        context['noaa_api_url'] = noaa_api_url
+        weather_raw_data = accessAPI.NOAA_API(noaa_api_url)
+        weather_data_by_day = parseAPI.NOAA_by_day(weather_raw_data)
+        context['weather_by_day'] = weather_data_by_day
+
         # weather_data = weather_raw_data["properties"]["periods"][0]
         # context['noaa_weather_data'] = weather_data
 

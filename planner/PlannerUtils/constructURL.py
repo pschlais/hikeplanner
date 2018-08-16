@@ -291,9 +291,9 @@ def buildNOAAapiURL(latitude, longitude):
         URL for NOAA forecast API call at given latitude/longitude
     """
 
-    # NOAA_API_URL = ("https://api.weather.gov/points/" + str(latitude)
-    #                   + "," + str(longitude) + "/forecast")
     NOAA_API_URL = ("https://api.weather.gov/points/" + str(latitude)
-                      + "," + str(longitude))
+                      + "," + str(longitude) + "/forecast")
+    # NOAA_API_URL = ("https://api.weather.gov/points/" + str(latitude)
+    #                   + "," + str(longitude))
 
     return NOAA_API_URL

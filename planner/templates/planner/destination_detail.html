@@ -82,7 +82,45 @@
     {% endif %}
 
     <section class="col dest-weather">
-      <iframe src="{{destination.noaa_embed_widget_url}}"></iframe>
+      {% if weather_by_day|length == 0 %}
+        <p>Weather forecast is not available.</p>
+      {% else %}
+      <div>
+        <ul class="nav nav-tabs" id="weatherTabs">
+          {% for day in weather_by_day %}
+            <li class="nav-item">
+              <a class ="nav-link {% if day.dayOfWeek == 'Today' %}active{% endif %}" data-toggle="tab" href="#weather{{day.dayOfWeek}}" role="tab">{{day.dayOfWeek}}</a>
+            </li>
+          {% endfor %}
+        </ul>
+        <div class="tab-content" id="weatherTabsContent">
+          {% for day in weather_by_day %}
+            <div class="tab-pane fade {% if day.dayOfWeek == 'Today' %}show active {% endif %}" id="weather{{day.dayOfWeek}}" role="tabpanel">
+              <div class="row">
+                {% for period in day.periodData %}
+                  <div class="col">
+                    <h3>{{period.name}}</h3>
+                    <img src="{{period.icon}}">
+                    <p>Temperature: {{period.temperature}}{{period.temperatureUnit}}</p>
+                    <p>Wind: {{period.windDirection}} {{period.windSpeed}}</p>
+                    <p>Forecast: {{period.detailedForecast}}</p>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!--
+      <img src="{{noaa_weather_data.icon}}">
+      <p>{{noaa_weather_data.name}}</p>
+      <p>{{noaa_weather_data.temperature}}{{noaa_weather_data.temperatureUnit}}</p>
+      <p>{{noaa_weather_data.shortForecast}}</p>
+      <p>{{noaa_weather_data.detailedForecast}}</p>
+    -->
+
     </section>
   </div>
 
@@ -95,7 +133,7 @@
         {% if routes %}
           <ul>
           {% for route in routes %}
-            <li><a href="{{route.get_absolute_url}}">{{route.name}}</a></li>
+            <li><a href="{{route.get_absolute_url}}">{{route.name}} - {{route.total_distance}} mi, {{route.gain}} ft gain</a></li>
           {% endfor %}
           </ul>
         {% else %}
