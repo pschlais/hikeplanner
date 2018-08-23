@@ -1,13 +1,12 @@
-{% extends "layout_detail.html" %}
+{% extends "planner/__l_detail_grid.html" %}
 
 {% load static %}
 
 
 
-{% block detail_custom_css %}
-
-<link rel="stylesheet" href="{% static 'planner/css/destination_detail.css' %}">
-
+{% block stylesheets %}
+  {{block.super}}
+  <link rel="stylesheet" href="{% static 'planner/css/destination_detail.css' %}">
 {% endblock %}
 
 
@@ -73,54 +72,16 @@
 
 
 {% block detail_below_fold %}
+  {% if destination.description %}
+  <section class="dest-description">
+    <h2>Description</h2>
+    <p>{{destination.description}}</p>
+  </section>
+  {% endif %}
+
   <div class="row">
-    {% if destination.description %}
-    <section class="col dest-description">
-      <h2>Description</h2>
-      <p>{{destination.description}}</p>
-    </section>
-    {% endif %}
-
     <section class="col dest-weather">
-      {% if weather_by_day|length == 0 %}
-        <p>Weather forecast is not available.</p>
-      {% else %}
-      <div>
-        <ul class="nav nav-tabs" id="weatherTabs">
-          {% for day in weather_by_day %}
-            <li class="nav-item">
-              <a class ="nav-link {% if day.dayOfWeek == 'Today' %}active{% endif %}" data-toggle="tab" href="#weather{{day.dayOfWeek}}" role="tab">{{day.dayOfWeek}}</a>
-            </li>
-          {% endfor %}
-        </ul>
-        <div class="tab-content" id="weatherTabsContent">
-          {% for day in weather_by_day %}
-            <div class="tab-pane fade {% if day.dayOfWeek == 'Today' %}show active {% endif %}" id="weather{{day.dayOfWeek}}" role="tabpanel">
-              <div class="row">
-                {% for period in day.periodData %}
-                  <div class="col">
-                    <h3>{{period.name}}</h3>
-                    <img src="{{period.icon}}">
-                    <p>Temperature: {{period.temperature}}{{period.temperatureUnit}}</p>
-                    <p>Wind: {{period.windDirection}} {{period.windSpeed}}</p>
-                    <p>Forecast: {{period.detailedForecast}}</p>
-                  </div>
-                {% endfor %}
-              </div>
-            </div>
-          {% endfor %}
-        </div>
-      </div>
-      {% endif %}
-
-      <!--
-      <img src="{{noaa_weather_data.icon}}">
-      <p>{{noaa_weather_data.name}}</p>
-      <p>{{noaa_weather_data.temperature}}{{noaa_weather_data.temperatureUnit}}</p>
-      <p>{{noaa_weather_data.shortForecast}}</p>
-      <p>{{noaa_weather_data.detailedForecast}}</p>
-    -->
-
+      {% include "planner/_weather_tabs.html" with weather_by_day=weather_by_day %}
     </section>
   </div>
 
@@ -167,11 +128,6 @@
       </table>
     </section>
   </div>
-{% endblock %}
+{% endblock detail_below_fold %}
 
 
-{% block custom_js %}
-{% endblock %}
-
-{% block jquery %}
-{% endblock %}

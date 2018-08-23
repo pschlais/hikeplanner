@@ -1,15 +1,4 @@
-{% extends "layout_detail.html" %}
-
-{% load static %}
-
-
-
-{% block detail_custom_css %}
-<!--
-<link rel="stylesheet" href="{% static 'planner/css/route_detail.css' %}">
--->
-{% endblock %}
-
+{% extends "planner/__l_detail_grid.html" %}
 
 
 {% block sidebar_content %}
@@ -133,12 +122,5 @@
       </table>
     </section>
   </div>
-{% endblock %}
-
-
-{% block custom_js %}
-{% endblock %}
-
-{% block jquery %}
 {% endblock %}
 

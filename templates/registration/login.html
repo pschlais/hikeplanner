@@ -1,8 +1,9 @@
-{% extends "base_site.html" %}
+{% extends "planner/__base.html" %}
 
 {% load static %}
 
-{% block custom_css %}
+{% block stylesheets %}
+  {{block.super}}
   <link rel="stylesheet" href="{% static 'registration/css/login.css' %}">
 {% endblock %}
 
@@ -52,4 +53,4 @@
   <p><a href="{% url 'password_reset' %}">Password reset</a></p>
 -->
 </div>
-{% endblock %}
+{% endblock body_override %}

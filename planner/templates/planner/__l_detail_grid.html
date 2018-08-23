@@ -1,0 +1,79 @@
+{% extends "planner/__base.html" %}
+
+{% load static %}
+
+{% block stylesheets %}
+  {{block.super}}
+  <link rel="stylesheet" href="{% static 'planner/css/layout_detail.css' %}">
+{% endblock %}
+
+{% block javascript_header %}
+  {{block.super}}
+{% endblock %}
+
+{% block main_content %}
+
+  {# Navigation - header of page #}
+  {% include "planner/_nav_header.html" with user=user %}
+
+  {# Page below navigation #}
+  <section class=row>
+
+   {# Sidebar - left of screen #}
+    <section class="col-2">
+      {% block sidebar_content %}{% endblock %}
+    </section>
+
+  {# Stage - layout of remaining right side of page #}
+    <section class="col-10">
+
+      {# main content row #}
+      <div class="row">
+
+        {# Summary, left half of top row #}
+        <section class="col detail-summary">
+          {% block detail_title %}
+          <h1>block detail_title</h1>
+          {% endblock %}
+
+          {# Summary block - stats to the left, buttons to the right #}
+          <div class="row">
+            <section class="col-8 detail-stats">
+              {% block detail_stats %}
+              <p>block detail_stats</p>
+              {% endblock %}
+            </section>
+
+            <section class="col-4 detail-buttons">
+              {% block detail_buttons %}
+              <p>block detail_buttons</p>
+              {% endblock %}
+            </section>
+          </div>
+        </section> {# end summary col #}
+
+        {# Map block - right half of top row #}
+        <section class="col detail-map-embed">
+          {% block detail_map_embed %}
+            <div>block detail_map_embed</div>
+          {% endblock %}
+        </section>
+
+      </div>
+
+  {# All content below main row #}
+  {% block detail_below_fold %}
+    <p>block detail_below_fold</p>
+  {% endblock %}
+    </section>
+  </section>
+
+{% endblock main_content %}
+
+{% block stage_content %}
+
+{% endblock stage_content %}
+
+{% block javascript_footer %}
+  {{block.super}}
+{% endblock %}

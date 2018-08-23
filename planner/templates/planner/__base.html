@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  {% block meta_tags %}
+    <meta charset="UTF-8">
+  {% endblock %}
+  <title>
+    {% block title %}Adventurer's Portal{% endblock %}
+  </title>
+
+  {% block stylesheets %}
+    <!-- CSS reset -->
+    <link rel="stylesheet" href="{% static 'planner/css/reset.css' %}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  {% endblock %}
+  {% block javascript_header %}
+  <!-- Bootstrap, JQuery -->
+  <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.3.1.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+  {% endblock %}
+</head>
+<body>
+  {% block body_override %}
+    <div class="container-fluid">
+      {% block main_content %}{% endblock %}
+    </div>
+  {% endblock %}
+
+  {% block javascript_footer %}{% endblock %}
+
+</body>
+</html>
