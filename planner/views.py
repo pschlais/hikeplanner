@@ -1,12 +1,13 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views import generic
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from .models import Destination, Route, Trailhead, Profile
-from .forms import ProfileForm
+from .forms import ProfileForm, DestinationForm
 from .PlannerUtils import constructURL
 from .PlannerUtils import accessAPI
 from .PlannerUtils import parseAPI
@@ -37,6 +38,18 @@ class DestinationDetailView(LoginRequiredMixin, generic.DetailView):
         context['weather_by_day'] = weather_data_by_day
 
         return context
+
+class DestinationCreate(CreateView):
+    model = Destination
+    fields = '__all__'
+
+class DestinationUpdate(UpdateView):
+    model = Destination
+    fields = '__all__'
+
+class DestinationDelete(DeleteView):
+    model=Destination
+    success_url = reverse_lazy('destination-list')
 
 # ------- Route views ------------------------------
 class RouteListView(LoginRequiredMixin, generic.ListView):
@@ -82,6 +95,21 @@ class TrailheadDetailView(LoginRequiredMixin, generic.DetailView):
         # context['noaa_weather_data'] = weather_data
 
         return context
+
+class TrailheadListView(LoginRequiredMixin, generic.ListView):
+    model=Trailhead
+
+class TrailheadCreate(CreateView):
+    model = Trailhead
+    fields = '__all__'
+
+class TrailheadUpdate(UpdateView):
+    model = Trailhead
+    fields = '__all__'
+
+class TrailheadDelete(DeleteView):
+    model=Trailhead
+    success_url = reverse_lazy('trailhead-list')
 
 # ------- User Profile views ----------------------
 class UserProfileDetailView(LoginRequiredMixin, generic.DetailView):

@@ -1,0 +1,14 @@
+{% extends "planner/__base.html" %}
+
+{% block main_content %}
+  <h1>Trailheads ({{trailhead_list | length}})</h1>
+  <p>
+    <a href="{% url 'trailhead-add' %}" class="btn btn-primary">Add New Trailhead</a>
+  </p>
+
+  <ul>
+    {% for TH in trailhead_list %}
+      <li><a href="{{TH.get_absolute_url}}">{{TH.name}}</a></li>
+    {% endfor %}
+  </ul>
+{% endblock %}

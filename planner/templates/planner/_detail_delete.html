@@ -1,0 +1,8 @@
+{# Standard detail view delete confirmation form #}
+{# passed a variable "detail_url_detail_name", a string i.e. "destination-detail" #}
+
+<form method="post">{% csrf_token %}
+  <p>Are you sure you want to delete "{{object}}"?</p>
+  <input type="submit" value="Confirm">
+  <a class="btn btn-secondary" href="{% url url_detail_name object.pk %}">Cancel</a>
+</form>
