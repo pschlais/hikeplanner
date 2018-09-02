@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from .models import Destination, Route, Trailhead, Profile
-from .forms import ProfileForm, DestinationForm
+from .forms import ProfileForm, RouteForm
 from .PlannerUtils import constructURL
 from .PlannerUtils import accessAPI
 from .PlannerUtils import parseAPI
@@ -48,15 +48,42 @@ class DestinationUpdate(UpdateView):
     fields = '__all__'
 
 class DestinationDelete(DeleteView):
-    model=Destination
+    model = Destination
     success_url = reverse_lazy('destination-list')
 
 # ------- Route views ------------------------------
 class RouteListView(LoginRequiredMixin, generic.ListView):
-    model=Route
+    model = Route
 
 class RouteDetailView(LoginRequiredMixin, generic.DetailView):
-    model=Route
+    model = Route
+
+class RouteCreate(CreateView):
+    model = Route
+    template_name = "planner/route_form.html"
+    form_class = RouteForm
+
+    def get(self, request, *args, **kwargs):
+        # set the initial destination if specified in GET request
+        if request.GET.get('destinationpk'):
+            dest_pk = int(request.GET.get('destinationpk'))
+            destination = Destination.objects.get(pk=dest_pk)
+
+            form = self.form_class(initial={'destination': destination})
+
+        else:  # generate blank form
+            form = self.form_class()
+
+        return render(request, self.template_name, {'form': form})
+
+
+class RouteUpdate(UpdateView):
+    model = Route
+    fields = '__all__'
+
+class RouteDelete(DeleteView):
+    model = Route
+    success_url = reverse_lazy('route-list')
 
 # ------- Trailhead views --------------------------
 class TrailheadDetailView(LoginRequiredMixin, generic.DetailView):

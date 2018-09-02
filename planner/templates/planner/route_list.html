@@ -1,10 +1,12 @@
 {% extends "planner/__base.html" %}
 
 {% block main_content %}
+  {% include "planner/_nav_header.html" %}
   <h1>Routes ({{route_list | length}})</h1>
+  <p><a href="{% url 'route-add' %}" class="btn btn-primary">Add New Route</a></p>
   <ul>
     {% for route in route_list %}
-      <li><a href="{{route.get_absolute_url}}">{{route.name}}</a></li>
+      <li><a href="{{route.get_absolute_url}}">{{route.destination.name}} - {{route.name}}</a></li>
     {% endfor %}
   </ul>
 {% endblock %}

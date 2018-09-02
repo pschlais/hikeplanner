@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from .models import Profile, Destination
+from .models import Profile, Destination, Route
 
 # Form classes
 class ProfileForm(ModelForm):
@@ -10,4 +10,9 @@ class ProfileForm(ModelForm):
 class DestinationForm(ModelForm):
     class Meta:
         model = Destination
+        fields = '__all__'
+
+class RouteForm(ModelForm):
+    class Meta:
+        model = Route
         fields = '__all__'

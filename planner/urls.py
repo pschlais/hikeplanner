@@ -12,6 +12,9 @@ urlpatterns = [
 
     path('routes/', views.RouteListView.as_view(), name='route-list'),
     path('route/<int:pk>/', views.RouteDetailView.as_view(), name='route-detail'),
+    path('route/add/', views.RouteCreate.as_view(), name='route-add'),
+    path('route/<int:pk>/edit/', views.RouteUpdate.as_view(), name='route-edit'),
+    path('route/<int:pk>/delete/', views.RouteDelete.as_view(), name='route-delete'),
 
     path('trailheads/', views.TrailheadListView.as_view(), name='trailhead-list'),
     path('trailhead/<int:pk>/', views.TrailheadDetailView.as_view(), name='trailhead-detail'),
