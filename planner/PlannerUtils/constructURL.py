@@ -173,7 +173,7 @@ def googleMapsEmbed(latitude, longitude):
         raise ValueError("longitude input must be between -180 and 180 degrees. Input value was {0}".format(longitude))
 
     # # URL construction
-    base_url = "https://maps.googleapis.com/maps/embed/v1/"
+    base_url = "https://maps.google.com/maps/embed/v1/"
     key = os.environ.get("HIKEPLANNER_GOOGLE_MAPS_EMBED_API_KEY")
     params = {
         "q": str(latitude) + "," + str(longitude),
