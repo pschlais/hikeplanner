@@ -69,9 +69,10 @@
 {% endblock %}
 
 {% block detail_map_embed %}
-  <img src="{{trailhead.google_maps_embed_url}}">
-  {# <img src="{% static 'planner/img/staticmap.png' %}"> #}
-  <p><a href="{{trailhead.google_maps_embed_url}}">TH static map</a></p>
+  <iframe width="100%" height="90%" frameborder="0" style="border:0" src="{{trailhead.google_maps_embed_url}}"></iframe>
+  <p><a href="{{trailhead.google_maps_embed_url}}">TH embedded map</a></p>
+  {# <img src="{{trailhead.google_maps_embed_url}}"> #}
+  {# <p><a href="{{trailhead.google_maps_embed_url}}">TH static map</a></p> #}
 {% endblock %}
 
 {% block detail_buttons %}

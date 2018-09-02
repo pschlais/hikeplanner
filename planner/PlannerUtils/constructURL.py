@@ -70,7 +70,7 @@ def googleMapsPointExternal(latitude, longitude, layer, zoom=15):
     return "&".join([base_url, center, zoom, layer])
 
 
-def googleMapsPointEmbed(latitude, longitude, width=500, height=400,
+def googleMapsStatic(latitude, longitude, width=500, height=400,
                          maptype="terrain", zoom=14):
     """
     Builds a URL for Google Maps centered at a point for various layer options.
@@ -123,11 +123,65 @@ def googleMapsPointEmbed(latitude, longitude, width=500, height=400,
         "zoom": str(zoom),
         "maptype": maptype.lower(),
         "markers": str(latitude) + "," + str(longitude),
-        "key": os.environ.get("HIKEPLANNER_GOOGLE_MAPS_EMBED_API_KEY"),
+        "key": os.environ.get("HIKEPLANNER_GOOGLE_MAPS_STATIC_API_KEY"),
     }
 
     # construct URL and encode characters
     return base_url + urllib.parse.urlencode(params)
+
+
+def googleMapsEmbed(latitude, longitude):
+    """
+    Builds a URL for Google Maps centered at a point for various layer options.
+
+    Parameters
+    ----------------
+    latitude : float
+        Latitude of the point
+    longitude : float
+        Longitude of the point
+    width : float
+        width of the returned image, in pixels
+    height: float
+        height of the returned image, in pixels
+    maptype : string
+        Map layer to display. Supported inputs are:
+            -"terrain"
+            -"satellite"
+            -"roadmap"
+            -"hybrid" (satellite + roadmap)
+    zoom : int
+        zoom level of the map
+            1: world
+            5: landmass/continent
+            10: city
+            15: streets
+            20: buildings
+
+    Returns
+    ----------------
+    string
+        URL for google maps standalone page
+    """
+
+    # input validation
+    MODE = 'place'
+
+    if not validLatLon(lat=latitude):
+        raise ValueError("latitude input must be between -90 and 90 degrees. Input value was {0}".format(latitude))
+    if not validLatLon(lon=longitude):
+        raise ValueError("longitude input must be between -180 and 180 degrees. Input value was {0}".format(longitude))
+
+    # # URL construction
+    base_url = "https://maps.googleapis.com/maps/embed/v1/"
+    key = os.environ.get("HIKEPLANNER_GOOGLE_MAPS_EMBED_API_KEY")
+    params = {
+        "q": str(latitude) + "," + str(longitude),
+    }
+
+    # construct URL and encode characters
+    return (base_url + MODE + "?key=" + key + "&" +
+            urllib.parse.urlencode(params))
 
 
 

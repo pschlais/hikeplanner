@@ -83,7 +83,7 @@ class Destination(models.Model):
         lat = self.latitude
         lon = self.longitude
         layer = "terrain"
-        return constructURL.googleMapsPointEmbed(lat, lon, maptype=layer)
+        return constructURL.googleMapsStatic(lat, lon, maptype=layer)
 
     @property
     def dest_type_expanded(self):
@@ -300,7 +300,7 @@ class Trailhead(models.Model):
         lat = self.latitude
         lon = self.longitude
         layer = "terrain"
-        return constructURL.googleMapsPointEmbed(lat, lon, maptype=layer)
+        return constructURL.googleMapsEmbed(lat, lon)
 
 
     def __str__(self):
