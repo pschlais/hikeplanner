@@ -6,12 +6,13 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
-from .models import Destination, Route, Trailhead, Profile
+from .models import Destination, Route, Trailhead, Profile, GoverningBody
 from .forms import ProfileForm, RouteForm
 from .PlannerUtils import constructURL
 from .PlannerUtils import accessAPI
 from .PlannerUtils import parseAPI
 import json
+
 
 # Create your views here.
 @login_required
@@ -21,10 +22,11 @@ def home_view(request):
 
 # -------- Destination views ------------------------
 class DestinationListView(LoginRequiredMixin, generic.ListView):
-    model=Destination
+    model = Destination
+
 
 class DestinationDetailView(LoginRequiredMixin, generic.DetailView):
-    model=Destination
+    model = Destination
 
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
@@ -39,24 +41,30 @@ class DestinationDetailView(LoginRequiredMixin, generic.DetailView):
 
         return context
 
-class DestinationCreate(CreateView):
+
+class DestinationCreate(LoginRequiredMixin, CreateView):
     model = Destination
     fields = '__all__'
 
-class DestinationUpdate(UpdateView):
+
+class DestinationUpdate(LoginRequiredMixin, UpdateView):
     model = Destination
     fields = '__all__'
 
-class DestinationDelete(DeleteView):
+
+class DestinationDelete(LoginRequiredMixin, DeleteView):
     model = Destination
     success_url = reverse_lazy('destination-list')
+
 
 # ------- Route views ------------------------------
 class RouteListView(LoginRequiredMixin, generic.ListView):
     model = Route
 
+
 class RouteDetailView(LoginRequiredMixin, generic.DetailView):
     model = Route
+
 
 class RouteCreate(CreateView):
     model = Route
@@ -77,13 +85,15 @@ class RouteCreate(CreateView):
         return render(request, self.template_name, {'form': form})
 
 
-class RouteUpdate(UpdateView):
+class RouteUpdate(LoginRequiredMixin, UpdateView):
     model = Route
     fields = '__all__'
 
-class RouteDelete(DeleteView):
+
+class RouteDelete(LoginRequiredMixin, DeleteView):
     model = Route
     success_url = reverse_lazy('route-list')
+
 
 # ------- Trailhead views --------------------------
 class TrailheadDetailView(LoginRequiredMixin, generic.DetailView):
@@ -123,28 +133,59 @@ class TrailheadDetailView(LoginRequiredMixin, generic.DetailView):
 
         return context
 
+
 class TrailheadListView(LoginRequiredMixin, generic.ListView):
-    model=Trailhead
+    model = Trailhead
 
-class TrailheadCreate(CreateView):
+
+class TrailheadCreate(LoginRequiredMixin, CreateView):
     model = Trailhead
     fields = '__all__'
 
-class TrailheadUpdate(UpdateView):
+
+class TrailheadUpdate(LoginRequiredMixin, UpdateView):
     model = Trailhead
     fields = '__all__'
 
-class TrailheadDelete(DeleteView):
-    model=Trailhead
+
+class TrailheadDelete(LoginRequiredMixin, DeleteView):
+    model = Trailhead
     success_url = reverse_lazy('trailhead-list')
+
+
+# -------- Governing Body views --------------------
+class GoverningBodyDetailView(LoginRequiredMixin, generic.DetailView):
+    model = GoverningBody
+
+
+class GoverningBodyListView(LoginRequiredMixin, generic.ListView):
+    model = GoverningBody
+
+
+class GoverningBodyCreate(LoginRequiredMixin, CreateView):
+    model = GoverningBody
+    fields = '__all__'
+
+
+class GoverningBodyUpdate(LoginRequiredMixin, UpdateView):
+    model = GoverningBody
+    fields = '__all__'
+
+
+class GoverningBodyDelete(LoginRequiredMixin, DeleteView):
+    model = GoverningBody
+    success_url = reverse_lazy('govbody-list')
+
 
 # ------- User Profile views ----------------------
 class UserProfileDetailView(LoginRequiredMixin, generic.DetailView):
-    model=User
+    model = User
+
 
 @login_required
 def profile_overview(request):
     return render(request, 'planner/profile_overview.html')
+
 
 @login_required
 def profile_update(request):

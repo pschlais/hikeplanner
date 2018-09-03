@@ -1,0 +1,17 @@
+{% extends "planner/__base.html" %}
+
+{% block main_content %}
+  {% include "planner/_nav_header.html" %}
+
+  <section class="row">
+    <section class="col">
+      <h1>Governing Bodies ({{governingbody_list | length}})</h1>
+      <p><a href="{% url 'govbody-add' %}" class="btn btn-primary">Add New Governing Body</a></p>
+      <ul>
+        {% for governingbody in governingbody_list %}
+          <li><a href="{{governingbody.get_absolute_url}}">{{governingbody.name}}{% if governingbody.abbr != None %} ({{governingbody.abbr}}){% endif %}</a></li>
+        {% endfor %}
+      </ul>
+    </section>
+  </section>
+{% endblock %}

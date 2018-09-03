@@ -1,5 +1,6 @@
 from django.forms import ModelForm
-from .models import Profile, Destination, Route
+from .models import Profile, Destination, Route, GoverningBody
+
 
 # Form classes
 class ProfileForm(ModelForm):
@@ -7,12 +8,20 @@ class ProfileForm(ModelForm):
         model = Profile
         exclude = ["user"]
 
+
 class DestinationForm(ModelForm):
     class Meta:
         model = Destination
         fields = '__all__'
 
+
 class RouteForm(ModelForm):
     class Meta:
         model = Route
+        fields = '__all__'
+
+
+class GoverningBodyForm(ModelForm):
+    class Meta:
+        model = GoverningBody
         fields = '__all__'

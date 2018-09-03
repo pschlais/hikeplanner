@@ -22,6 +22,12 @@ urlpatterns = [
     path('trailhead/<int:pk>/edit/', views.TrailheadUpdate.as_view(), name='trailhead-edit'),
     path('trailhead/<int:pk>/delete/', views.TrailheadDelete.as_view(), name='trailhead-delete'),
 
+    path('govbody/<int:pk>/', views.GoverningBodyDetailView.as_view(), name='govbody-detail'),
+    path('govbodies/', views.GoverningBodyListView.as_view(), name='govbody-list'),
+    path('govbody/add/', views.GoverningBodyCreate.as_view(), name='govbody-add'),
+    path('govbody/<int:pk>/edit/', views.GoverningBodyUpdate.as_view(), name='govbody-edit'),
+    path('govbody/<int:pk>/delete/', views.GoverningBodyDelete.as_view(), name='govbody-delete'),
+
     path('profile/', views.profile_overview, name='profile-detail'),
     path('profile/edit/', views.profile_update, name='profile-update'),
 ]

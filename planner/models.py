@@ -44,7 +44,7 @@ class Destination(models.Model):
 
     # ---- METHODS -------------------
     def get_absolute_url(self):
-        return reverse('destination-detail', args=[str(self.id)])
+        return reverse('destination-detail', args=[str(self.pk)])
 
     @property
     def google_maps_terrain_url(self):
@@ -144,7 +144,7 @@ class Route(models.Model):
 
     # ----- METHODS ----------------
     def get_absolute_url(self):
-        return reverse('route-detail', args=[str(self.id)])
+        return reverse('route-detail', args=[str(self.pk)])
 
     @property
     def path_seq_expanded(self):
@@ -237,7 +237,11 @@ class GoverningBody(models.Model):
 
     # ----- METHODS ----------------
     def get_absolute_url(self):
-        pass
+        return reverse('govbody-detail', args=[str(self.pk)])
+
+    @property
+    def level_of_government_expanded(self):
+        return dict(self.LEVEL_OF_GOVT_CHOICES)[self.level_of_government]
 
     def __str__(self):
         return self.name
@@ -261,7 +265,7 @@ class Trailhead(models.Model):
 
     # ----- METHODS ----------------
     def get_absolute_url(self):
-        return reverse('trailhead-detail', args=[str(self.id)])
+        return reverse('trailhead-detail', args=[str(self.pk)])
 
     @property
     def google_maps_terrain_url(self):
@@ -287,10 +291,6 @@ class Trailhead(models.Model):
     def noaa_url(self):
         return constructURL.buildNOAAURL(self.latitude, self.longitude)
 
-    # @property
-    # def noaa_embed_widget_url(self):
-    #     return constructURL.buildNOAAembedURL(self.latitude, self.longitude)
-
     @property
     def noaa_api_url(self):
         return constructURL.buildNOAAapiURL(self.latitude, self.longitude)
@@ -302,36 +302,8 @@ class Trailhead(models.Model):
         layer = "terrain"
         return constructURL.googleMapsEmbed(lat, lon)
 
-
     def __str__(self):
         return self.name
-
-
-# class Address(models.Model):
-#     """
-#     Model containing a street address in the continental US
-#     """
-#     # ----- FIELDS ---------------------
-#     street = models.CharField(max_length=100, verbose_name="Street Address")
-#     city = models.CharField(max_length=50)
-#     state = models.CharField(max_length=2)
-#     zip_code = models.CharField(validators=[MinLengthValidator(5), MaxLengthValidator(5)])
-
-#     @property
-#     def street_line(self):
-#         return self.street
-
-#     @property
-#     def city_line(self):
-#         return "{0}, {1} {2}".format(self.city, self.state, self.zip_code)
-
-#     # ----- METADATA --------------------
-#     class Meta:
-#         pass
-
-#     # ----- METHODS ---------------------
-#     def __str__(self):
-#         return "{0}, {1}, {2} {3}".format(self.street, self.city, self.state, self.zip_code)
 
 
 class MajorCity(models.Model):

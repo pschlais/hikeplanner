@@ -1,0 +1,19 @@
+{% extends "planner/__l_left_sidebar.html" %}
+
+{% block sidebar_content %}
+  <p><a href="{% url 'govbody-edit' pk=governingbody.pk %}" class="btn btn-primary">Edit</a></p>
+  <p><a href="{% url 'govbody-delete' pk=governingbody.pk %}" class="btn btn-danger">Delete</a></p>
+{% endblock %}
+
+{% block stage_content %}
+  <section class="row">
+    <section class="col">
+      <h1>Governing Body:</h1>
+      <p>{{governingbody.name}}</p>
+      <h1>Abbreviation:</h1>
+      <p>{{governingbody.abbr}}</p>
+      <h1>Level of Government:</h1>
+      <p>{{governingbody.level_of_government_expanded}}</p>
+    </section>
+  </section>
+{% endblock %}
