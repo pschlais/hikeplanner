@@ -201,7 +201,7 @@ class Jurisdiction(models.Model):
 
     # ----- METHODS ----------------
     def get_absolute_url(self):
-        pass
+        return reverse('jurisdiction-detail', args=[str(self.pk)])
 
     def __str__(self):
         return self.name

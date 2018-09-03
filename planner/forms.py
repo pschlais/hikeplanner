@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from .models import Profile, Destination, Route, GoverningBody
+from .models import Profile, Destination, Route, GoverningBody, Jurisdiction
 
 
 # Form classes
@@ -18,6 +18,12 @@ class DestinationForm(ModelForm):
 class RouteForm(ModelForm):
     class Meta:
         model = Route
+        fields = '__all__'
+
+
+class Jurisdiction(ModelForm):
+    class Meta:
+        model = Jurisdiction
         fields = '__all__'
 
 

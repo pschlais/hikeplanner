@@ -1,0 +1,37 @@
+{% extends "planner/__l_left_sidebar.html" %}
+
+{% block sidebar_content %}
+  <p><a href="{% url 'jurisdiction-edit' pk=jurisdiction.pk %}" class="btn btn-primary btn-block">Edit</a></p>
+  <p><a href="{% url 'jurisdiction-delete' pk=jurisdiction.pk %}" class="btn btn-danger btn-block">Delete</a></p>
+{% endblock %}
+
+{% block stage_content %}
+  <section class="row">
+    <section class="col">
+      <h1>{{jurisdiction.name}}</h1>
+      {% if jurisdiction.governingbody != None %}
+        <p>Part of: <a href="{% url 'govbody-detail' pk=jurisdiction.governingbody.pk %}">{{jurisdiction.governingbody.name}}</a></p>
+      {% endif %}
+
+      <p>Website:
+        {% if jurisdiction.website != "" %}
+          <a href="{{jurisdiction.website}}" target="_blank">{{jurisdiction.website}}</a>
+        {% else %}
+          Not available
+        {% endif %}
+      </p>
+      <h2>Parking Information</h2>
+      <p>{% if jurisdiction.parking_info != "" %}
+          {{jurisdiction.parking_info}}
+        {% else %}
+          Not available
+        {% endif %}</p>
+      <h2>Camping Information</h2>
+     <p>{% if jurisdiction.camping_info != "" %}
+          {{jurisdiction.camping_info}}
+        {% else %}
+          Not available
+        {% endif %}</p>
+    </section>
+  </section>
+{% endblock %}

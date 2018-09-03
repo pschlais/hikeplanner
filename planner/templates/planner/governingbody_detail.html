@@ -1,8 +1,8 @@
 {% extends "planner/__l_left_sidebar.html" %}
 
 {% block sidebar_content %}
-  <p><a href="{% url 'govbody-edit' pk=governingbody.pk %}" class="btn btn-primary">Edit</a></p>
-  <p><a href="{% url 'govbody-delete' pk=governingbody.pk %}" class="btn btn-danger">Delete</a></p>
+  <p><a href="{% url 'govbody-edit' pk=governingbody.pk %}" class="btn btn-primary btn-block">Edit</a></p>
+  <p><a href="{% url 'govbody-delete' pk=governingbody.pk %}" class="btn btn-danger btn-block">Delete</a></p>
 {% endblock %}
 
 {% block stage_content %}

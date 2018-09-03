@@ -7,6 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from .models import Destination, Route, Trailhead, Profile, GoverningBody
+from .models import Jurisdiction
 from .forms import ProfileForm, RouteForm
 from .PlannerUtils import constructURL
 from .PlannerUtils import accessAPI
@@ -175,6 +176,30 @@ class GoverningBodyUpdate(LoginRequiredMixin, UpdateView):
 class GoverningBodyDelete(LoginRequiredMixin, DeleteView):
     model = GoverningBody
     success_url = reverse_lazy('govbody-list')
+
+
+# --------Jurisdiction views ---------------------
+class JurisdictionDetailView(LoginRequiredMixin, generic.DetailView):
+    model = Jurisdiction
+
+
+class JurisdictionListView(LoginRequiredMixin, generic.ListView):
+    model = Jurisdiction
+
+
+class JurisdictionCreate(LoginRequiredMixin, CreateView):
+    model = Jurisdiction
+    fields = '__all__'
+
+
+class JurisdictionUpdate(LoginRequiredMixin, UpdateView):
+    model = Jurisdiction
+    fields = '__all__'
+
+
+class JurisdictionDelete(LoginRequiredMixin, DeleteView):
+    model = Jurisdiction
+    success_url = reverse_lazy('jurisdiction-list')
 
 
 # ------- User Profile views ----------------------
