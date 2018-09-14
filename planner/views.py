@@ -115,7 +115,7 @@ class TrailheadDetailView(LoginRequiredMixin, generic.DetailView):
 
         # call Google Distance Matrix API and parse results
         distRawData = accessAPI.googleMapsDistanceAPI(directions_api_url)
-        distData = accessAPI.unpackDriveProperties(distRawData)
+        distData = parseAPI.unpackDriveProperties(distRawData)
 
         context['directions_api_status'] = distData["APIStatus"]
         context['directions_api_message'] = distData["APIMessage"]

@@ -300,8 +300,12 @@ class Trailhead(models.Model):
     def google_maps_embed_url(self):
         lat = self.latitude
         lon = self.longitude
-        layer = "terrain"
+        # layer = "terrain"
         return constructURL.googleMapsEmbed(lat, lon)
+
+    @property
+    def latlon_str(self):
+        return str(self.latitude) + "," + str(self.longitude)
 
     def __str__(self):
         return self.name
@@ -321,6 +325,10 @@ class MajorCity(models.Model):
         pass
 
     # ----- METHODS ---------------------
+    @property
+    def latlon_str(self):
+        return str(self.latitude) + "," + str(self.longitude)
+
     def __str__(self):
         return self.name
 
@@ -348,6 +356,11 @@ class DriveTimeMajorCity(models.Model):
     date_updated = models.DateField(default=date(1900, 1, 1))
     api_call_status = models.IntegerField(choices=LAST_API_CALL_STATUS,
                     default=NEW_ITEM)
+    error_message = models.CharField(max_length=1000, default="")
+
+    @property
+    def api_call_status_expanded(self):
+        return dict(self.LAST_API_CALL_STATUS)[self.api_call_status]
 
 
 class Profile(models.Model):

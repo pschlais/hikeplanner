@@ -1,5 +1,8 @@
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models.query import QuerySet
 from planner.models import Trailhead, MajorCity, DriveTimeMajorCity
+from planner.PlannerUtils import constructURL, accessAPI, parseAPI
+from datetime import date
 
 
 def createNewDriveTimeEntries():
@@ -35,3 +38,105 @@ def createNewDriveTimeEntries():
     output_strings.append("Total new entries: {0}".format(new_count))
     # return optional output
     return {'num_added': new_count, 'print_output': output_strings}
+
+
+def updateDriveTimeEntries(run_new=True, run_errors=False):
+    """
+    Calls Google Distance Matrix API and adds results to the table.
+
+    INPUTS:
+    run_new (bool): run any combinations marked as "NEW_ITEM"
+    run_errors (bool): run any combinations marked as "ERROR"
+    """
+    num_updated = 0
+    output_strings = []
+
+    # get all major cities
+    majorcities = MajorCity.objects.all()
+    # loop over major cities
+    for majorcity in majorcities:
+        # get queryset for current majorcity
+        qs = QuerySet(model=DriveTimeMajorCity)
+        if run_new:
+            qs_new = DriveTimeMajorCity.objects.filter(majorcity=majorcity,
+                        api_call_status=DriveTimeMajorCity.NEW_ITEM)
+            qs.union(qs_new)
+        if run_errors:
+            qs_error = DriveTimeMajorCity.objects.filter(majorcity=majorcity,
+                        api_call_status=DriveTimeMajorCity.ERROR)
+            qs.union(qs_error)
+
+        # create url if values to update
+        if qs.count() > 0:
+            output_strings.append("Records to update: " + qs.count())
+            # add origin and destinations to URL
+            origin = majorcity.latlon_str
+            destinations = []
+            for combo in qs:
+                output_strings.append(combo.api_call_status_expanded +
+                    " ----- " + majorcity.name + " : " + combo.trailhead.name)
+                destinations.append(combo.trailhead.latlon_str)
+
+            # create URL
+            apiURL = constructURL.googleMapsDistanceAPI(origin, destination)
+            output_strings.append("API call: " + apiURL)
+            # call API
+            apiOutput = accessAPI.googleMapsDistanceAPI(apiURL)
+            # parse API results
+            for i_dest, dest in destinations:
+                apiParse = parseAPI.unpackDriveProperties(apiOutput,
+                                        destination_index=i_dest)
+                if apiParse["APIStatus"] != "OK":
+                    # set entry to error, save error message
+                    output_strings.append(
+                        "API error for " + qs[i_dest].majorcity.name + " : " +
+                        qs[i_dest].trailhead.name + " -- '" +
+                        apiParse["APIMessage"] + "'")
+
+                    qs[i_dest].api_call_status = DriveTimeMajorCity.ERROR
+                    qs[i_dest].error_message = apiParse["APIMessage"]
+                    qs[i_dest].drive_distance = None
+                    qs[i_dest].drive_time = None
+                    qs[i_dest].save()
+
+                else:  # overall API call returned data
+                    if apiParse["dataStatus"] != "OK":
+                        # set entry to error, save error message
+                        output_strings.append(
+                            "Data error for " + qs[i_dest].majorcity.name +
+                            " : " + qs[i_dest].trailhead.name + " -- '" +
+                            apiParse["dataMessage"] + "'")
+
+                        qs[i_dest].api_call_status = DriveTimeMajorCity.ERROR
+                        qs[i_dest].error_message = apiParse["dataMessage"]
+                        qs[i_dest].drive_distance = None
+                        qs[i_dest].drive_time = None
+                        qs[i_dest].save()
+
+                    else:
+                        # data is valid, save results
+                        output_strings.append(
+                            "VALID -- " + qs[i_dest].majorcity.name + " : " +
+                            qs[i_dest].trailhead.name + " -- '" +
+                            apiParse["dataMessage"] + "'")
+
+                        output_strings.append("     distance: " +
+                            str(apiParse["distance"]["value"]) + ", time: " +
+                            str(apiParse["duration"]["value"]))
+
+                        qs[i_dest].api_call_status = DriveTimeMajorCity.OK
+                        qs[i_dest].error_message = ""
+                        qs[i_dest].drive_distance = apiParse["distance"]["value"]
+                        qs[i_dest].drive_time = apiParse["duration"]["value"]
+                        qs[i_dest].date_updated = date.today()
+                        qs[i_dest].save()
+
+                        num_updated += 1
+
+            output_strings.append("Number updated: " + str(num_updated))
+
+        else:
+            output_strings.append("No records to update")
+
+        return {'num_updated': num_updated,
+                'print_output': output_strings}

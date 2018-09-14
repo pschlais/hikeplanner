@@ -215,7 +215,7 @@ def googleMapsDirectionsExternal(origin, destination):
 
 def googleMapsDistanceAPI(origins, destinations):
     """
-    Builds a URL for Google Maps directions URL between the origin and destination.
+    Builds a URL for Google Maps distance matrix API between the origin and destination.
 
     Parameters
     ----------------
