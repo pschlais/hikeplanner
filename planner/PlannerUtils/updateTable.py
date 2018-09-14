@@ -78,7 +78,7 @@ def updateDriveTimeEntries(run_new=True, run_errors=False):
                 destinations.append(combo.trailhead.latlon_str)
 
             # create URL
-            apiURL = constructURL.googleMapsDistanceAPI(origin, destination)
+            apiURL = constructURL.googleMapsDistanceAPI(origin, destinations)
             output_strings.append("API call: " + apiURL)
             # call API
             apiOutput = accessAPI.googleMapsDistanceAPI(apiURL)
