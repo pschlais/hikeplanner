@@ -83,7 +83,7 @@ def updateDriveTimeEntries(run_new=True, run_errors=False):
             # call API
             apiOutput = accessAPI.googleMapsDistanceAPI(apiURL)
             # parse API results
-            for i_dest, dest in destinations:
+            for i_dest, dest in enumerate(destinations):
                 apiParse = parseAPI.unpackDriveProperties(apiOutput,
                                         destination_index=i_dest)
                 if apiParse["APIStatus"] != "OK":
