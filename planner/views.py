@@ -118,7 +118,9 @@ class TrailheadDetailView(LoginRequiredMixin, generic.DetailView):
         distData = accessAPI.unpackDriveProperties(distRawData)
 
         context['directions_api_status'] = distData["APIStatus"]
-        context['directions_api_message'] = distData["dataStatus"]
+        context['directions_api_message'] = distData["APIMessage"]
+        context['directions_api_data_status'] = distData["dataStatus"]
+        context['directions_api_data_status'] = distData["dataMessage"]
         context['directions_api_duration'] = distData["duration"]["text"]
         context['directions_api_distance'] = distData["distance"]["text"]
 

@@ -4,6 +4,7 @@ from django.core.validators import MinLengthValidator, MaxLengthValidator, MinVa
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from datetime import date
 
 # from django.contrib.auth.models import User
 from .PlannerUtils import constructURL
@@ -322,6 +323,31 @@ class MajorCity(models.Model):
     # ----- METHODS ---------------------
     def __str__(self):
         return self.name
+
+
+class DriveTimeMajorCity(models.Model):
+    """
+    Through model managing MajorCity and Trailhead many-to-many relationship.
+    Contains drive time and timer about last update.
+    """
+    NEW_ITEM = 1
+    OK = 2
+    ERROR = 3
+
+    LAST_API_CALL_STATUS = (
+        (NEW_ITEM, 'New Item'),
+        (OK, 'OK'),
+        (ERROR, 'Error'),
+        )
+
+    trailhead = models.ForeignKey(Trailhead, on_delete=models.CASCADE)
+    majorcity = models.ForeignKey(MajorCity, on_delete=models.CASCADE)
+    drive_distance = models.FloatField(validators=[MinValueValidator(0)], null=True)
+    drive_time = models.FloatField(validators=[MinValueValidator(0)], null=True)
+    # default date_updated to 1900 so hook will mark it for update if not set
+    date_updated = models.DateField(default=date(1900, 1, 1))
+    api_call_status = models.IntegerField(choices=LAST_API_CALL_STATUS,
+                    default=NEW_ITEM)
 
 
 class Profile(models.Model):

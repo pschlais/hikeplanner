@@ -21,7 +21,7 @@ class RouteForm(ModelForm):
         fields = '__all__'
 
 
-class Jurisdiction(ModelForm):
+class JurisdictionForm(ModelForm):
     class Meta:
         model = Jurisdiction
         fields = '__all__'

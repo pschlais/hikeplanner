@@ -62,8 +62,11 @@
   {% if directions_api_status != "OK" %}
   <div class="alert alert-danger">{{directions_api_message}}</div>
   {% endif %}
+  {% if directions_api_data_status != "OK" and directions_api_data_status != "" %}
+  <div class="alert alert-danger">{{directions_api_data_message}}</div>
+  {% endif %}
 
-  <div><a id="TH-directions-button" href="{{directions_external_url}}" class="btn btn-primary" target="_blank">Open Driving Directions</a></div>
+  <div><a id="TH-directions-button" href="{{directions_external_url}}" class="btn btn-primary btn-block" target="_blank">Open Driving Directions</a></div>
   <p><a href="{{directions_api_url}}">Directions API call</a></p>
 
 {% endblock %}
@@ -75,10 +78,10 @@
 {% endblock %}
 
 {% block detail_buttons %}
-  <a href="{{trailhead.google_maps_terrain_url}}" class="btn btn-secondary" target="_blank">Google Terrain</a>
-  <a href="{{trailhead.google_maps_satellite_url}}" class="btn btn-secondary" target="_blank">Google Satellite</a>
-  <a href="{{trailhead.caltopo_url}}" class="btn btn-secondary" target="_blank">CalTopo</a>
-  <a href="{{trailhead.noaa_url}}" class="btn btn-secondary" target="_blank">NOAA Weather</a>
+  <a href="{{trailhead.google_maps_terrain_url}}" class="btn btn-secondary btn-block" target="_blank">Google Terrain</a>
+  <a href="{{trailhead.google_maps_satellite_url}}" class="btn btn-secondary btn-block" target="_blank">Google Satellite</a>
+  <a href="{{trailhead.caltopo_url}}" class="btn btn-secondary btn-block" target="_blank">CalTopo</a>
+  <a href="{{trailhead.noaa_url}}" class="btn btn-secondary btn-block" target="_blank">NOAA Weather</a>
 {% endblock %}
 
 

@@ -3,6 +3,8 @@ db.sqlite3
 *.sublime*
 */__pycache__/
 */*/__pycache__/
+*/*/*/__pycache__/
+*/*/*/*/__pycache__/
 staticfiles/*
 staticfiles/!placeholder.txt
 .env

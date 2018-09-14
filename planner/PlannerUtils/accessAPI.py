@@ -39,7 +39,9 @@ def unpackDriveProperties(apiObj, origin_index=0, destination_index=0):
 
     returnDict = {
         "APIStatus": apiObj["status"],
+        "APIMessage": "",
         "dataStatus": "",
+        "dataMessage": "",
         "duration": {
             "value": None,
             "text": "Not Available",
@@ -59,11 +61,52 @@ def unpackDriveProperties(apiObj, origin_index=0, destination_index=0):
             returnDict["duration"] = drive_data["duration"]
             returnDict["distance"] = drive_data["distance"]
 
+        elif drive_data["status"] == "NOT_FOUND":
+            returnDict["dataMessage"] = drive_data.get("message",
+                    "Distance Matrix API could not geocode origin " +
+                    "and/or destination.")
+
+        elif drive_data["status"] == "ZERO_RESULTS":
+            returnDict["dataMessage"] = drive_data.get("message",
+                    "Distance Matrix API could not find a route between " +
+                    "origin and destination.")
+
+        elif drive_data["status"] == "MAX_ROUTE_LENGTH_EXCEEDED":
+            returnDict["dataMessage"] = drive_data.get("message",
+                    "Max route length limit of Distance Matrix API exceeded," +
+                    " cannot be processed.")
+
+        else:
+            returnDict["dataMessage"] = ("Unhandled Distance Matrix API " +
+                     "route error encountered.")
+
     elif apiObj["status"] == "URL_ERROR":
-        returnDict["dataStatus"] = apiObj["message"]
+        returnDict["APIMessage"] = apiObj.get("message",
+                    "HTTP error accessing Google Distance API.")
+
+    elif apiObj["status"] == "INVALID_REQUEST":
+        returnDict["APIMessage"] = apiObj.get("message",
+                    "Distance Matrix API request is invalid.")
+
+    elif apiObj["status"] == "MAX_ELEMENTS_EXCEEDED":
+        returnDict["APIMessage"] = apiObj.get("message",
+                    "Distance Matrix API request has too many query entries.")
+
+    elif apiObj["status"] == "OVER_DAILY_LIMIT":
+        returnDict["APIMessage"] = apiObj.get("message",
+                    "Over Distance Matrix API query daily limit.")
+
+    elif apiObj["status"] == "REQUEST_DENIED":
+        returnDict["APIMessage"] = apiObj.get("message",
+                    "Service denied from Distance Matrix API for this " +
+                    "application.")
+
+    elif apiObj["status"] == "UNKNOWN_ERROR":
+        returnDict["APIMessage"] = apiObj.get("message",
+                    "Unknown Distance Matrix API server error.")
 
     else:
-        returnDict["dataStatus"] = "No data processed, unhandled API status"
+        returnDict["APIMessage"] = "No data processed, unhandled API status."
 
     return returnDict
 
