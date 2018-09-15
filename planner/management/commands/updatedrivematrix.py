@@ -26,7 +26,7 @@ class Command(BaseCommand):
         parser.add_argument(
             '--all',
             action='store_true',
-            dest='all',
+            dest='allentries',
             help=('Query Google Distance Matrix API for new & error table ' +
                   'entries'),
         )
@@ -36,7 +36,7 @@ class Command(BaseCommand):
         if options['error_only']:
             output = updateTable.updateDriveTimeEntries(run_new=False,
                                                         run_errors=True)
-        elif options['all']:
+        elif options['allentries']:
             output = updateTable.updateDriveTimeEntries(run_new=True,
                                                         run_errors=True)
         else:

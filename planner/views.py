@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from .models import Destination, Route, Trailhead, Profile, GoverningBody
-from .models import Jurisdiction
+from .models import Jurisdiction, DriveTimeMajorCity
 from .forms import ProfileForm, RouteForm
 from .PlannerUtils import constructURL
 from .PlannerUtils import accessAPI
@@ -158,11 +158,24 @@ class TrailheadCreate(LoginRequiredMixin, CreateView):
                                             args=[str(th.pk)]))
 
 
-
-
 class TrailheadUpdate(LoginRequiredMixin, UpdateView):
     model = Trailhead
     fields = '__all__'
+
+    def form_valid(self, form):
+        # get old object lat/lon to check for changes
+        lat_old = self.get_object().latitude
+        lon_old = self.get_object().longitude
+        # save TH to database
+        th = form.save()
+        # check if lat or lon have changed from update
+        if (th.latitude != lat_old or th.longitude != lon_old):
+            # set all instances with this trailhead as a new entry
+            DriveTimeMajorCity.objects.filter(trailhead=self.get_object()).update(api_call_status=DriveTimeMajorCity.NEW_ITEM)
+            # trigger calculation of new drive times into database
+            updateTable.updateDriveTimeEntries()
+        # redirect to newly-created trailhead detail page
+        return HttpResponseRedirect(self.get_object().get_absolute_url())
 
 
 class TrailheadDelete(LoginRequiredMixin, DeleteView):
