@@ -7,6 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from .models import Destination, Route, Trailhead, Profile, GoverningBody
+from django.db.models import Q
 from .models import Jurisdiction, DriveTimeMajorCity
 from .forms import ProfileForm, RouteForm
 from .PlannerUtils import constructURL
@@ -25,6 +26,46 @@ def home_view(request):
 # -------- Destination views ------------------------
 class DestinationListView(LoginRequiredMixin, generic.ListView):
     model = Destination
+
+class DestinationSearchView(LoginRequiredMixin, generic.ListView):
+    """
+    This is the main destination search view. It finds destinations based on
+    the location of the starting trailhead.
+    It starts from the DTMC model, searching through foreign keys:
+    DTMC --> Trailhead --> Route --> Destination
+    """
+    model = DriveTimeMajorCity
+    template_name = 'planner/destination_search_list.html'
+
+    def get_queryset(self):
+        queryset = DriveTimeMajorCity.objects.filter(
+                    api_call_status=DriveTimeMajorCity.OK
+                ).filter(
+                    majorcity=self.request.user.profile.nearest_city
+                ).order_by(
+                    "drive_time"
+                )
+        return queryset
+
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+
+    #     for key, val in context.items():
+    #         print("key: " + str(key), " val: " + str(val))
+    #     # # create dictionary of trailhead times to user's major city
+    #     # DTMC = DriveTimeMajorCity.objects.filter(trailhead__in=self.get_queryset(), majorcity=self.request.user.profile.nearest_city, api_call_status=DriveTimeMajorCity.OK)
+    #     # drivetime_dict = {}
+    #     # drivedistance_dict = {}
+    #     # for entry in DTMC:
+    #     #     drivetime_dict[entry.trailhead.id] = entry.drive_time_str
+    #     #     drivedistance_dict[entry.trailhead.id] = entry.drive_distance_miles
+
+    #     # context['drivetime_dict'] = drivetime_dict
+    #     # context['drivedistance_dict'] = drivedistance_dict
+
+    #     return context
+
+
 
 
 class DestinationDetailView(LoginRequiredMixin, generic.DetailView):

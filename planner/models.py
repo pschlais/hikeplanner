@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from datetime import date
+import math
 
 # from django.contrib.auth.models import User
 from .PlannerUtils import constructURL
@@ -367,14 +368,16 @@ class DriveTimeMajorCity(models.Model):
         # Google Distance Matrix API returns distance in meters
         return self.drive_distance / 1609.34
 
+    @property
     def drive_time_minutes(self):
         # Google Distance Matrix API returns duration in seconds
         return self.drive_time / 60
 
+    @property
     def drive_time_str(self):
         # return data in 'X hr Y min' format
-        hours = self.drive_time % 3600
-        minutes = (self.drive_time - hours * 3600) % 60
+        hours = int(math.floor(self.drive_time / 3600))
+        minutes = int(math.floor((self.drive_time - hours * 3600) / 60))
         return str(hours) + ' hr ' + str(minutes) + ' min'
 
 

@@ -14,6 +14,10 @@ urlpatterns = [
          name='destination-edit'),
     path('destination/<int:pk>/delete/', views.DestinationDelete.as_view(),
          name='destination-delete'),
+    path('destination/search/', views.DestinationSearchView.as_view(),
+         name='destination-search'),
+    path('destinations/search/', views.DestinationSearchView.as_view(),
+         name='destination-search'),
 
     path('routes/', views.RouteListView.as_view(),
          name='route-list'),

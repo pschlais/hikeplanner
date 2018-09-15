@@ -136,11 +136,11 @@ def updateDriveTimeEntries(run_new=True, run_errors=False):
 
                         num_updated += 1
 
-            output_strings.append("Number updated: " + str(num_updated))
-
         else:
             output_strings.append("No records to update for major city " +
                                   majorcity.name)
+
+    output_strings.append("Number updated: " + str(num_updated))
 
     return {'num_updated': num_updated,
             'print_output': output_strings}
