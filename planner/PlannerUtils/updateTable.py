@@ -56,15 +56,18 @@ def updateDriveTimeEntries(run_new=True, run_errors=False):
     # loop over major cities
     for majorcity in majorcities:
         # get queryset for current majorcity
-        qs = QuerySet(model=DriveTimeMajorCity)
         if run_new:
             qs_new = DriveTimeMajorCity.objects.filter(majorcity=majorcity,
                         api_call_status=DriveTimeMajorCity.NEW_ITEM)
-            qs.union(qs_new)
+            qs = qs_new
         if run_errors:
             qs_error = DriveTimeMajorCity.objects.filter(majorcity=majorcity,
                         api_call_status=DriveTimeMajorCity.ERROR)
-            qs.union(qs_error)
+            qs = qs_error
+
+        # combine both new and error entries if both flags True
+        if run_new and run_errors:
+            qs = qs_new.union(qs_error)
 
         # create url if values to update
         if qs.count() > 0:
