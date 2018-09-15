@@ -12,6 +12,7 @@ from .forms import ProfileForm, RouteForm
 from .PlannerUtils import constructURL
 from .PlannerUtils import accessAPI
 from .PlannerUtils import parseAPI
+from .PlannerUtils import updateTable
 import json
 
 
@@ -144,6 +145,18 @@ class TrailheadListView(LoginRequiredMixin, generic.ListView):
 class TrailheadCreate(LoginRequiredMixin, CreateView):
     model = Trailhead
     fields = '__all__'
+
+    def form_valid(self, form):
+        # save TH to database
+        form.save()
+        # trigger major city drive time table update functions
+        updateTable.createNewDriveTimeEntries()
+        # trigger calculation of new drive times into database
+        updateTable.updateDriveTimeEntries()
+        # redirect to newly-created trailhead detail page
+        return HttpResponseRedirect(self.get_object().get_absolute_url())
+
+
 
 
 class TrailheadUpdate(LoginRequiredMixin, UpdateView):

@@ -362,6 +362,21 @@ class DriveTimeMajorCity(models.Model):
     def api_call_status_expanded(self):
         return dict(self.LAST_API_CALL_STATUS)[self.api_call_status]
 
+    @property
+    def drive_distance_miles(self):
+        # Google Distance Matrix API returns distance in meters
+        return self.drive_distance / 1609.34
+
+    def drive_time_minutes(self):
+        # Google Distance Matrix API returns duration in seconds
+        return self.drive_time / 60
+
+    def drive_time_str(self):
+        # return data in 'X hr Y min' format
+        hours = self.drive_time % 3600
+        minutes = (self.drive_time - hours * 3600) % 60
+        return str(hours) + ' hr ' + str(minutes) ' min'
+
 
 class Profile(models.Model):
     """
