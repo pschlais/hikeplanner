@@ -148,13 +148,14 @@ class TrailheadCreate(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         # save TH to database
-        form.save()
+        th = form.save()
         # trigger major city drive time table update functions
         updateTable.createNewDriveTimeEntries()
         # trigger calculation of new drive times into database
         updateTable.updateDriveTimeEntries()
         # redirect to newly-created trailhead detail page
-        return HttpResponseRedirect(self.get_object().get_absolute_url())
+        return HttpResponseRedirect(reverse('trailhead-detail',
+                                            args=[str(th.pk)]))
 
 
 
