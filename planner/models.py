@@ -375,7 +375,7 @@ class DriveTimeMajorCity(models.Model):
         # return data in 'X hr Y min' format
         hours = self.drive_time % 3600
         minutes = (self.drive_time - hours * 3600) % 60
-        return str(hours) + ' hr ' + str(minutes) ' min'
+        return str(hours) + ' hr ' + str(minutes) + ' min'
 
 
 class Profile(models.Model):
