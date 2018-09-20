@@ -1,5 +1,8 @@
 {% extends "planner/__l_left_sidebar.html" %}
 
+{% load planner_timeconvert %}
+{% load planner_distconvert %}
+
 {% block stage_content %}
 <table class="table-striped">
   <thead>
@@ -14,18 +17,16 @@
     </tr>
   </thead>
   <tbody>
-    {% for drive_time_entry in drivetimemajorcity_list %}
-      {% for route in drive_time_entry.trailhead.route_set.all %}
-        <tr>
-          <td><a href="{{route.destination.get_absolute_url}}">{{route.destination.name}}</a></td>
-          <td><a href="{{route.get_absolute_url}}">{{route.name}}</a></td>
-          <td>{{route.total_distance|floatformat:1}} mi</td>
-          <td>{{route.gain}} ft</td>
-          <td>{{route.class_rating}}</td>
-          <td>{{drive_time_entry.drive_time_str}}</td>
-          <td>{{drive_time_entry.drive_distance_miles|floatformat:"0"}} mi</td>
-        </tr>
-      {% endfor %}
+    {% for route in route_list %}
+      <tr>
+        <td><a href="{{route.destination.get_absolute_url}}">{{route.destination.name}}</a></td>
+        <td><a href="{{route.get_absolute_url}}">{{route.name}}</a></td>
+        <td>{{route.total_distance|floatformat:1}} mi</td>
+        <td>{{route.gain}} ft</td>
+        <td>{{route.class_rating}}</td>
+        <td>{{route.trailhead_drive_time|sec_to_hour_min_trunc:"hour"}} hr {{route.trailhead_drive_time|sec_to_hour_min_trunc:"min"}} min</td>
+        <td>{{route.trailhead_drive_distance|m_to_miles|floatformat:"0"}} mi</td>
+      </tr>
     {% endfor %}
   </tbody>
 </table>

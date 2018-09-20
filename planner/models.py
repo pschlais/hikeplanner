@@ -260,6 +260,8 @@ class Trailhead(models.Model):
     county = models.ForeignKey(County, on_delete=models.SET_NULL, null=True)
     jurisdiction = models.ForeignKey(Jurisdiction, on_delete=models.SET_NULL,
                                      null=True)
+    majorcity = models.ManyToManyField('MajorCity',
+                                       through='DriveTimeMajorCity')
 
     # ----- METADATA --------------
     class Meta:
@@ -349,7 +351,7 @@ class DriveTimeMajorCity(models.Model):
         (ERROR, 'Error'),
         )
 
-    trailhead = models.ForeignKey(Trailhead, on_delete=models.CASCADE)
+    trailhead = models.ForeignKey(Trailhead, on_delete=models.CASCADE, related_name="drive_data")
     majorcity = models.ForeignKey(MajorCity, on_delete=models.CASCADE)
     drive_distance = models.FloatField(validators=[MinValueValidator(0)], null=True)
     drive_time = models.FloatField(validators=[MinValueValidator(0)], null=True)

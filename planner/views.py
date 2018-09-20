@@ -7,14 +7,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from .models import Destination, Route, Trailhead, Profile, GoverningBody
-from django.db.models import Q
+from django.db.models import Q, F
 from .models import Jurisdiction, DriveTimeMajorCity
-from .forms import ProfileForm, RouteForm
+from .forms import ProfileForm, RouteForm, TrailheadForm
 from .PlannerUtils import constructURL
 from .PlannerUtils import accessAPI
 from .PlannerUtils import parseAPI
 from .PlannerUtils import updateTable
 import json
+import math
 
 
 # Create your views here.
@@ -34,18 +35,28 @@ class DestinationSearchView(LoginRequiredMixin, generic.ListView):
     It starts from the DTMC model, searching through foreign keys:
     DTMC --> Trailhead --> Route --> Destination
     """
-    model = DriveTimeMajorCity
+    model = Route
     template_name = 'planner/destination_search_list.html'
 
     def get_queryset(self):
-        queryset = DriveTimeMajorCity.objects.filter(
-                    api_call_status=DriveTimeMajorCity.OK
+
+        valid_routes = Route.objects.filter(
+                trailhead__drive_data__api_call_status=DriveTimeMajorCity.OK
                 ).filter(
-                    majorcity=self.request.user.profile.nearest_city
+                trailhead__drive_data__majorcity=self.request.user.profile.nearest_city
                 ).order_by(
-                    "drive_time"
+                "trailhead__drive_data__drive_time"
+                ).select_related(
+                "destination"
+                ).annotate(
+                trailhead_drive_time=F("trailhead__drive_data__drive_time"),
+                trailhead_drive_distance=F("trailhead__drive_data__drive_distance")
                 )
+
+        queryset = valid_routes
+
         return queryset
+
 
     # def get_context_data(self, **kwargs):
     #     context = super().get_context_data(**kwargs)
@@ -185,7 +196,7 @@ class TrailheadListView(LoginRequiredMixin, generic.ListView):
 
 class TrailheadCreate(LoginRequiredMixin, CreateView):
     model = Trailhead
-    fields = '__all__'
+    form_class = TrailheadForm
 
     def form_valid(self, form):
         # save TH to database
@@ -201,7 +212,7 @@ class TrailheadCreate(LoginRequiredMixin, CreateView):
 
 class TrailheadUpdate(LoginRequiredMixin, UpdateView):
     model = Trailhead
-    fields = '__all__'
+    form_class = TrailheadForm
 
     def form_valid(self, form):
         # get old object lat/lon to check for changes

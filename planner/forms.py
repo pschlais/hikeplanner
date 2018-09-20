@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from .models import Profile, Destination, Route, GoverningBody, Jurisdiction
+from .models import Profile, Destination, Route, GoverningBody, Jurisdiction, Trailhead
 
 
 # Form classes
@@ -19,6 +19,12 @@ class RouteForm(ModelForm):
     class Meta:
         model = Route
         fields = '__all__'
+
+
+class TrailheadForm(ModelForm):
+    class Meta:
+        model = Trailhead
+        exclude = ['majorcity']
 
 
 class JurisdictionForm(ModelForm):
