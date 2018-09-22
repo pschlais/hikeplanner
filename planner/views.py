@@ -9,11 +9,12 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from .models import Destination, Route, Trailhead, Profile, GoverningBody
 from django.db.models import Q, F
 from .models import Jurisdiction, DriveTimeMajorCity
-from .forms import ProfileForm, RouteForm, TrailheadForm
+from .forms import ProfileForm, RouteForm, TrailheadForm, DestinationSearchForm
 from .PlannerUtils import constructURL
 from .PlannerUtils import accessAPI
 from .PlannerUtils import parseAPI
 from .PlannerUtils import updateTable
+from .PlannerUtils import conversions
 import json
 import math
 
@@ -36,45 +37,95 @@ class DestinationSearchView(LoginRequiredMixin, generic.ListView):
     DTMC --> Trailhead --> Route --> Destination
     """
     model = Route
+    search_form_class = DestinationSearchForm
     template_name = 'planner/destination_search_list.html'
+
 
     def get_queryset(self):
 
-        valid_routes = Route.objects.filter(
-                trailhead__drive_data__api_call_status=DriveTimeMajorCity.OK
-                ).filter(
-                trailhead__drive_data__majorcity=self.request.user.profile.nearest_city
-                ).order_by(
-                "trailhead__drive_data__drive_time"
-                ).select_related(
-                "destination"
-                ).annotate(
+        # Get base set of routes before user filters (routes with valid
+        # drive times from the user's selected closest major city)
+
+        # set up base query for Route object
+        base_query = {
+            "trailhead__drive_data__api_call_status": DriveTimeMajorCity.OK,
+            "trailhead__drive_data__majorcity": self.request.user.profile.nearest_city,
+            }
+
+        # compile all query filters based on user input
+        all_query = self._get_all_filter_kwargs(base_query)
+
+        # get queryset in single filter request to ensure ManyToMany are
+        # occuring at the same time as "AND" requests:
+        # https://docs.djangoproject.com/en/2.1/topics/db/queries/#spanning-multi-valued-relationships
+        valid_routes = Route.objects.filter(**all_query)
+
+        # # ----- Order data by increasing drive time ---------
+        valid_routes = valid_routes.order_by("trailhead__drive_data__drive_time")
+        # select related (prefetch) destination data, and annotate data
+        valid_routes = valid_routes.select_related("destination").annotate(
                 trailhead_drive_time=F("trailhead__drive_data__drive_time"),
                 trailhead_drive_distance=F("trailhead__drive_data__drive_distance")
                 )
 
+        # return final queryset
         queryset = valid_routes
 
         return queryset
 
+    def _get_all_filter_kwargs(self, base_kwargs=None):
+        """
+        Utility function to get user filter GET parameters and return as dict
+        for kwarg inputs to QuerySet.filter(). Adds them to input dict
 
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
+        INPUTS:
+        base_kwargs [dict] (OPTIONAL) --> base QuerySet to add to. Otherwise creates a new dictionary.
 
-    #     for key, val in context.items():
-    #         print("key: " + str(key), " val: " + str(val))
-    #     # # create dictionary of trailhead times to user's major city
-    #     # DTMC = DriveTimeMajorCity.objects.filter(trailhead__in=self.get_queryset(), majorcity=self.request.user.profile.nearest_city, api_call_status=DriveTimeMajorCity.OK)
-    #     # drivetime_dict = {}
-    #     # drivedistance_dict = {}
-    #     # for entry in DTMC:
-    #     #     drivetime_dict[entry.trailhead.id] = entry.drive_time_str
-    #     #     drivedistance_dict[entry.trailhead.id] = entry.drive_distance_miles
+        OUTPUT:
+        dict --> All QuerySet filers to apply, to be unpacked with **
+        """
+        if base_kwargs is None:
+            out_dict = {}
+        else:
+            out_dict = base_kwargs
 
-    #     # context['drivetime_dict'] = drivetime_dict
-    #     # context['drivedistance_dict'] = drivedistance_dict
+        for param in self.request.GET:
+            value = self.request.GET[param]
+            # only search on non-empty parameters from form request
+            if value != "":
+                # apply applicable filters based on parameter
+                # print("filter param: {0}, value: {1}".format(param, value))
+                if param == "min_length":
+                    out_dict["total_distance__gte"] = float(value)
+                elif param == "max_length":
+                    out_dict["total_distance__lte"] = float(value)
+                elif param == "min_gain":
+                    out_dict["gain__gte"] = float(value)
+                elif param == "max_gain":
+                    out_dict["gain__lte"] = float(value)
+                elif param == "min_class":
+                    out_dict["class_rating__gte"] = int(value)
+                elif param == "max_class":
+                    out_dict["class_rating__lte"] = int(value)
+                elif param == "max_drive_distance":
+                    out_dict["trailhead__drive_data__drive_distance__lte"] = conversions.miles_to_m(float(value))
+                elif param == "max_drive_time":
+                    # Template filter truncates the minute level, so set cutoff of the database search at the next minute
+                    out_dict["trailhead__drive_data__drive_time__lte"] = conversions.min_to_sec(float(value)+1)
+                elif param == "dest_type":
+                    out_dict["destination__dest_type__exact"] = value
+                elif param == "path_seq":
+                    out_dict["path_seq__exact"] = value
 
-    #     return context
+        return out_dict
+
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["search_form"] = self.search_form_class(self.request.GET)
+
+        return context
 
 
 

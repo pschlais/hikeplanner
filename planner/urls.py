@@ -16,8 +16,8 @@ urlpatterns = [
          name='destination-delete'),
     path('destination/search/', views.DestinationSearchView.as_view(),
          name='destination-search'),
-    path('destinations/search/', views.DestinationSearchView.as_view(),
-         name='destination-search'),
+    # provide another permutation of destination search, no name hook
+    path('destinations/search/', views.DestinationSearchView.as_view()),
 
     path('routes/', views.RouteListView.as_view(),
          name='route-list'),

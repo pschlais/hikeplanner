@@ -110,7 +110,7 @@ class Route(models.Model):
 
     PATH_SEQ_CHOICES = (
         (OUT_AND_BACK, 'Out-And-Back'),
-        (ONE_WAY, 'One-Way'),
+        (ONE_WAY, 'Through Hike'),
         (LOOP, 'Loop'),
     )
 

@@ -3,31 +3,45 @@
 {% load planner_timeconvert %}
 {% load planner_distconvert %}
 
+{% block sidebar_content %}
+<h3>Search Filters</h3>
+<form action="" method="get">
+  {{search_form.as_p}}
+  <input type="submit" value="Search">
+</form>
+{% endblock %}
+
 {% block stage_content %}
-<table class="table-striped">
-  <thead>
-    <tr>
-      <th scope="col">Destination</th>
-      <th scope="col">Route</th>
-      <th scope="col">Length</th>
-      <th scope="col">Elevation Gain</th>
-      <th scope="col">Class</th>
-      <th scope="col">Drive Time From {{user.profile.nearest_city.name}}</th>
-      <th scope="col">Drive Distance From {{user.profile.nearest_city.name}}</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for route in route_list %}
+{% if route_list %}
+  <table class="table-striped">
+    <thead>
       <tr>
-        <td><a href="{{route.destination.get_absolute_url}}">{{route.destination.name}}</a></td>
-        <td><a href="{{route.get_absolute_url}}">{{route.name}}</a></td>
-        <td>{{route.total_distance|floatformat:1}} mi</td>
-        <td>{{route.gain}} ft</td>
-        <td>{{route.class_rating}}</td>
-        <td>{{route.trailhead_drive_time|sec_to_hour_min_trunc:"hour"}} hr {{route.trailhead_drive_time|sec_to_hour_min_trunc:"min"}} min</td>
-        <td>{{route.trailhead_drive_distance|m_to_miles|floatformat:"0"}} mi</td>
+        <th scope="col">Destination</th>
+        <th scope="col">Route</th>
+        <th scope="col">Length</th>
+        <th scope="col">Elevation Gain</th>
+        <th scope="col">Class</th>
+        <th scope="col">Drive Time From {{user.profile.nearest_city.name}}</th>
+        <th scope="col">Drive Distance From {{user.profile.nearest_city.name}}</th>
       </tr>
-    {% endfor %}
-  </tbody>
-</table>
+    </thead>
+    <tbody>
+      {% for route in route_list %}
+        <tr>
+          <td><a href="{{route.destination.get_absolute_url}}">{{route.destination.name}}</a></td>
+          <td><a href="{{route.get_absolute_url}}">{{route.name}}</a></td>
+          <td>{{route.total_distance|floatformat:1}} mi</td>
+          <td>{{route.gain}} ft</td>
+          <td>{{route.class_rating}}</td>
+          {# <td>{{route.trailhead_drive_time}}</td> #}
+          <td>{{route.trailhead_drive_time|sec_to_hour_min_trunc:"hour"}} hr {{route.trailhead_drive_time|sec_to_hour_min_trunc:"min"}} min</td>
+          {# <td>{{route.trailhead_drive_distance}}</td> #}
+          <td>{{route.trailhead_drive_distance|m_to_miles|dist_roundup|floatformat:"0"}} mi</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+<p>No routes in the database match your criteria.</p>
+{% endif %}
 {% endblock %}
