@@ -40,28 +40,44 @@ def createNewDriveTimeEntries():
     return {'num_added': new_count, 'print_output': output_strings}
 
 
-def updateDriveTimeEntries(run_new=True, run_errors=False):
+def updateDriveTimeEntries(run_new=True, run_errors=False,
+                           origin_type="majorcity"):
     """
     Calls Google Distance Matrix API and adds results to the table.
+    Requests are created and called per single-origin, looped over all
+    available origin points to all available destinations. The origin type is
+    defined by the "origin_type" optional input, defaulted to "majorcity"
 
     INPUTS:
     run_new (bool): run any combinations marked as "NEW_ITEM"
     run_errors (bool): run any combinations marked as "ERROR"
+    origin_type (str): Input to set origins in API request. "majorcity"
+                        does loop per MajorCity object, "trailhead" does loop
+                        per Trailhead object
     """
     num_updated = 0
     output_strings = []
 
-    # get all major cities
-    majorcities = MajorCity.objects.all()
-    # loop over major cities
-    for majorcity in majorcities:
-        # get queryset for current majorcity
+    # get all origin objects
+    if origin_type == "trailhead":
+        origins = Trailhead.objects.all()
+    else:
+        origins = MajorCity.objects.all()
+
+    # loop over origins
+    for origin in origins:
+        # get queryset for current origin
+        if origin_type == "trailhead":
+            origin_filter = {'trailhead': origin}
+        else:
+            origin_filter = {'majorcity': origin}
+
         if run_new:
-            qs_new = DriveTimeMajorCity.objects.filter(majorcity=majorcity,
+            qs_new = DriveTimeMajorCity.objects.filter(**origin_filter,
                         api_call_status=DriveTimeMajorCity.NEW_ITEM)
             qs = qs_new
         if run_errors:
-            qs_error = DriveTimeMajorCity.objects.filter(majorcity=majorcity,
+            qs_error = DriveTimeMajorCity.objects.filter(**origin_filter,
                         api_call_status=DriveTimeMajorCity.ERROR)
             qs = qs_error
 
@@ -73,15 +89,21 @@ def updateDriveTimeEntries(run_new=True, run_errors=False):
         if qs.count() > 0:
             output_strings.append("Records to update: " + str(qs.count()))
             # add origin and destinations to URL
-            origin = majorcity.latlon_str
+            origin_latlon = origin.latlon_str
             destinations = []
             for combo in qs:
                 output_strings.append(combo.api_call_status_expanded +
-                    " ----- " + majorcity.name + " : " + combo.trailhead.name)
-                destinations.append(combo.trailhead.latlon_str)
+                    " ----- " + combo.majorcity.name + " : " +
+                    combo.trailhead.name)
+
+                if origin_type == "trailhead":
+                    destinations.append(combo.majorcity.latlon_str)
+                else:
+                    destinations.append(combo.trailhead.latlon_str)
 
             # create URL
-            apiURL = constructURL.googleMapsDistanceAPI(origin, destinations)
+            apiURL = constructURL.googleMapsDistanceAPI(origin_latlon,
+                                                        destinations)
             output_strings.append("API call: " + apiURL)
             # call API
             apiOutput = accessAPI.googleMapsDistanceAPI(apiURL)
@@ -137,8 +159,8 @@ def updateDriveTimeEntries(run_new=True, run_errors=False):
                         num_updated += 1
 
         else:
-            output_strings.append("No records to update for major city " +
-                                  majorcity.name)
+            output_strings.append("No records to update for origin " +
+                                  origin.name)
 
     output_strings.append("Number updated: " + str(num_updated))
 

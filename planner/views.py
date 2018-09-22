@@ -173,21 +173,21 @@ class RouteDetailView(LoginRequiredMixin, generic.DetailView):
 
 class RouteCreate(CreateView):
     model = Route
-    template_name = "planner/route_form.html"
-    form_class = RouteForm
+    fields = '__all__'
+    # template_name = "planner/route_form.html"
+    # form_class = RouteForm
 
-    def get(self, request, *args, **kwargs):
+    def get_form_kwargs(self):
         # set the initial destination if specified in GET request
-        if request.GET.get('destinationpk'):
-            dest_pk = int(request.GET.get('destinationpk'))
+        if self.request.GET.get('destinationpk'):
+            dest_pk = int(self.request.GET.get('destinationpk'))
             destination = Destination.objects.get(pk=dest_pk)
+            self.initial.update({'destination': destination})
 
-            form = self.form_class(initial={'destination': destination})
+        # get call superclass function
+        kwargs = super().get_form_kwargs()
 
-        else:  # generate blank form
-            form = self.form_class()
-
-        return render(request, self.template_name, {'form': form})
+        return kwargs
 
 
 class RouteUpdate(LoginRequiredMixin, UpdateView):
@@ -255,7 +255,7 @@ class TrailheadCreate(LoginRequiredMixin, CreateView):
         # trigger major city drive time table update functions
         updateTable.createNewDriveTimeEntries()
         # trigger calculation of new drive times into database
-        updateTable.updateDriveTimeEntries()
+        updateTable.updateDriveTimeEntries(origin_type="trailhead")
         # redirect to newly-created trailhead detail page
         return HttpResponseRedirect(reverse('trailhead-detail',
                                             args=[str(th.pk)]))
