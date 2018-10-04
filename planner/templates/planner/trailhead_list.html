@@ -1,6 +1,7 @@
 {% extends "planner/__base.html" %}
 
 {% block main_content %}
+  {% include "planner/_nav_header.html" %}
   <h1>Trailheads ({{trailhead_list | length}})</h1>
   <p>
     <a href="{% url 'trailhead-add' %}" class="btn btn-primary">Add New Trailhead</a>

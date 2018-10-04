@@ -55,6 +55,10 @@ def unpackDriveProperties(apiObj, origin_index=0, destination_index=0):
         returnDict["APIMessage"] = apiObj.get("message",
                     "HTTP error accessing Google Distance API.")
 
+    elif apiObj["status"] == "SSL_ERROR":
+        returnDict["APIMessage"] = apiObj.get("message",
+                    "SSL error accessing Google Distance API.")
+
     elif apiObj["status"] == "INVALID_REQUEST":
         returnDict["APIMessage"] = apiObj.get("message",
                     "Distance Matrix API request is invalid.")

@@ -63,10 +63,54 @@ class RouteForm(forms.ModelForm):
         fields = '__all__'
 
 
+class RouteComboForm(forms.ModelForm):
+    """
+    This form class is used in combination with creating a Destination.
+    """
+    class Meta:
+        model = Route
+        exclude = ['destination']
+
+
+    def __init__(self, trailhead_required, *args, **kwargs):
+
+        if type(trailhead_required) is not bool:
+            raise TypeError("trailhead_required must be True or False")
+
+        super().__init__(*args, **kwargs)
+        self.fields['trailhead'].required = trailhead_required
+
+    def reset_default_required_fields(self):
+        # Sets the route form to the default empty form state (existing trailhead not required, assume new trailhead will be input)
+        self.fields['trailhead'].required = False
+
+
 class TrailheadForm(forms.ModelForm):
     class Meta:
         model = Trailhead
         exclude = ['majorcity']
+
+
+class TrailheadComboForm(TrailheadForm):
+    """
+    This form class is used in combination with a Route.
+    All inputs are set as not required in HTML. A separate form element determines this, and ensuring values are not empty is done in the clean() method.
+    """
+
+    def __init__(self, new_entry_required, *args, **kwargs):
+
+        if type(new_entry_required) is not bool:
+            raise TypeError("new_entry_required must be True or False")
+        self.new_entry_required = new_entry_required
+
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].required = new_entry_required
+
+    def reset_default_required_fields(self):
+        # Sets the trailhead form to the default empty form state (not required, assume existing trailhead will be selected)
+        for field in self.fields:
+            self.fields[field].required = False
 
 
 class JurisdictionForm(forms.ModelForm):

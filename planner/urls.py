@@ -10,6 +10,8 @@ urlpatterns = [
          name='destination-detail'),
     path('destination/add/', views.DestinationCreate.as_view(),
          name='destination-add'),
+    path('destination/add_combo/', views.destination_create_combo,
+         name='destination-add-combo'),
     path('destination/<int:pk>/edit/', views.DestinationUpdate.as_view(),
          name='destination-edit'),
     path('destination/<int:pk>/delete/', views.DestinationDelete.as_view(),

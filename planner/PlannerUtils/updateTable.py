@@ -87,7 +87,7 @@ def updateDriveTimeEntries(run_new=True, run_errors=False,
 
         # create url if values to update
         if qs.count() > 0:
-            output_strings.append("Records to update: " + str(qs.count()))
+            output_strings.append("Records to update for origin {0}: ".format(origin.name) + str(qs.count()))
             # add origin and destinations to URL
             origin_latlon = origin.latlon_str
             destinations = []

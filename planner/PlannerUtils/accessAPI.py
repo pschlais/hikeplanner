@@ -1,8 +1,6 @@
 """ This module provides access to external web APIs """
-import urllib.request
 import requests
-from urllib.error import URLError
-import json
+from requests.exceptions import HTTPError, SSLError
 
 
 def googleMapsDistanceAPI(requestURL):
@@ -14,12 +12,20 @@ def googleMapsDistanceAPI(requestURL):
     # make sure the URL call does not throw an error
     try:
         apiCall = requests.get(requestURL)
-    except URLError:
+    except HTTPError:
         # i.e. CERTIFICATE_VERIFY_FAILED error
         # Create dictionary for view to parse wtih error information
         apiObj = {}
-        apiObj["status"] = "URL_ERROR"
+        apiObj["status"] = "HTTP_ERROR"
         apiObj["message"] = "HTTP error accessing Google Distance Matrix API."
+
+        response = apiObj
+    except SSLError:
+        # i.e. CERTIFICATE_VERIFY_FAILED error
+        # Create dictionary for view to parse wtih error information
+        apiObj = {}
+        apiObj["status"] = "SSL_ERROR"
+        apiObj["message"] = "SSL error accessing Google Distance Matrix API."
 
         response = apiObj
     else:
@@ -40,11 +46,11 @@ def NOAA_API(requestURL):
     try:
         # apiCall = urllib.request.urlopen(requestURL)
         apiCall = requests.get(requestURL)
-    except URLError:
+    except HTTPError:
         # i.e. CERTIFICATE_VERIFY_FAILED error
         # Create dictionary for view to parse wtih error information
         apiObj = {}
-        apiObj["status"] = "URL_ERROR"
+        apiObj["status"] = "HTTP_ERROR"
         apiObj["message"] = "HTTP error accessing NOAA forecast API."
 
         response = apiObj

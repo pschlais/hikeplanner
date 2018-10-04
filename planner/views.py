@@ -10,6 +10,8 @@ from .models import Destination, Route, Trailhead, Profile, GoverningBody
 from django.db.models import Q, F
 from .models import Jurisdiction, DriveTimeMajorCity
 from .forms import ProfileForm, RouteForm, TrailheadForm, DestinationSearchForm
+from .forms import DestinationForm
+from .forms import RouteComboForm, TrailheadComboForm
 from .PlannerUtils import constructURL
 from .PlannerUtils import accessAPI
 from .PlannerUtils import parseAPI
@@ -150,6 +152,77 @@ class DestinationDetailView(LoginRequiredMixin, generic.DetailView):
 class DestinationCreate(LoginRequiredMixin, CreateView):
     model = Destination
     fields = '__all__'
+
+
+@login_required
+def destination_create_combo(request):
+
+    if request.POST:
+        # default
+        forms_valid = True
+        add_trailhead = (request.POST.get("add_trailhead") == "Yes")
+        print("add trailhead: " + str(add_trailhead))
+        # check destination form
+        dest_form = DestinationForm(request.POST, prefix="dest")
+        forms_valid = forms_valid and dest_form.is_valid()
+
+        # check route and trailhead forms
+        if not add_trailhead:
+            route_form = RouteComboForm(True, request.POST, prefix="route")
+            forms_valid = forms_valid and route_form.is_valid()
+        else:  # add new trailhead
+            route_form = RouteComboForm(False, request.POST, prefix="route")
+            trailhead_form = TrailheadComboForm(True, request.POST, prefix="th")
+            forms_valid = forms_valid and route_form.is_valid() and trailhead_form.is_valid()
+
+        if forms_valid:
+            # save destination
+            new_dest = dest_form.save()
+
+            # set up route with new destination
+            new_route = route_form.save(commit=False)
+            new_route.destination = new_dest
+
+            # save trailhead
+            if add_trailhead:
+                new_th = trailhead_form.save()
+                # add new trailhead to route
+                new_route.trailhead = new_th
+
+            # if using existing trailhead, already in form object from request
+            new_route.save()
+
+            # redirect to newly created destination page
+            return redirect(new_dest.get_absolute_url())
+
+        else:  # forms not valid, return populated forms
+            # dest_form already created and validation errors included
+            # route_form needs to reset
+            route_form.reset_default_required_fields()
+            # trailhead_form needs to be reset. If a new trailhead wasn't
+            # requested by the route, send back an empty TH form
+            if add_trailhead:
+                trailhead_form.reset_default_required_fields()
+            else:
+                trailhead_form = TrailheadComboForm(False, prefix="th")
+
+    else:
+        # serve empty forms
+        dest_form = DestinationForm(prefix="dest")
+        route_form = RouteComboForm(False, prefix="route")
+        trailhead_form = TrailheadComboForm(False, prefix="th")
+
+    # get context data
+    context_dict = {
+                    'dest_form': dest_form,
+                    'route_form': route_form,
+                    'trailhead_form': trailhead_form
+                    }
+
+    return render(request, "planner/destination_combo_create.html", context_dict)
+
+
+
 
 
 class DestinationUpdate(LoginRequiredMixin, UpdateView):

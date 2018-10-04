@@ -1,0 +1,25 @@
+{% extends "planner/__base.html" %}
+
+{% block main_content %}
+
+  {% include "planner/_nav_header.html" %}
+
+  <div class="row">
+    <div class="col">
+      <form action="" method="post">
+        {% csrf_token %}
+        <h1>Destination</h1>
+        {{ dest_form.as_p }}
+        <h1>Route</h1>
+        {{ route_form.as_p }}
+        <p>Add a new trailhead?</p>
+        <input type="radio" name="add_trailhead" value="Yes" checked>Yes<br>
+        <input type="radio" name="add_trailhead" value="No">No<br>
+        <h1>Trailhead</h1>
+        {{ trailhead_form.as_p }}
+        <input type="submit" value="Create" />
+      </form>
+    </div>
+  </div>
+
+{% endblock main_content %}

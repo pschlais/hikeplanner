@@ -2,6 +2,8 @@ from django.db import models
 from django.urls import reverse
 from django.core.validators import MinLengthValidator, MaxLengthValidator, MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from datetime import date
@@ -39,6 +41,8 @@ class Destination(models.Model):
                                  verbose_name='Destination Type')
     jurisdiction = models.ForeignKey('Jurisdiction',on_delete=models.SET_NULL, null=True)
     description = models.TextField(max_length=5000, blank=True)
+    # link_public = GenericRelation('PublicLink',
+    #                               related_query_name='destination')
 
     # ---- METADATA ----------------
     class Meta:
@@ -427,3 +431,17 @@ def create_user_profile(sender, instance, created, **kwargs):
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
+
+
+class PublicLink(models.Model):
+    """
+    Model representing a link on a page that any user of the site can see.
+    """
+    label = models.CharField(max_length=50)
+    url = models.URLField()
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+
+    def __str__(self):
+        return "({0}) {1}".format(self.label, self.url)
