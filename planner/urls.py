@@ -27,6 +27,8 @@ urlpatterns = [
          name='route-detail'),
     path('route/add/', views.RouteCreate.as_view(),
          name='route-add'),
+    path('route/add_combo/', views.route_create_combo,
+         name='route-add-combo'),
     path('route/<int:pk>/edit/', views.RouteUpdate.as_view(),
          name='route-edit'),
     path('route/<int:pk>/delete/', views.RouteDelete.as_view(),

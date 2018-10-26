@@ -14,7 +14,7 @@
 {% block sidebar_content %}
   <div>
     <p><a href="{% url 'destination-edit' pk=destination.pk %}" class="btn btn-primary">Edit Page</a></p>
-    <p><a href="{% url 'route-add' %}?destinationpk={{destination.pk}}" class="btn btn-primary">Add Route</a></p>
+    <p><a href="{% url 'route-add-combo' %}?destinationpk={{destination.pk}}" class="btn btn-primary">Add Route</a></p>
   </div>
   <h3>Relevant Links</h3>
   <ul>

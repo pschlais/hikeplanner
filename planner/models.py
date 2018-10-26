@@ -138,9 +138,7 @@ class Route(models.Model):
                                                     help_text="Yosemite Decimal System (1-5)")
     county = models.ForeignKey('County', on_delete=models.SET_NULL, null=True)
     jurisdiction = models.ForeignKey('Jurisdiction',on_delete=models.SET_NULL, null=True)
-    destination = models.ForeignKey(Destination,
-                                         verbose_name="Accessible Destination",
-                                         help_text="Destination accessible by this route", on_delete=models.CASCADE)
+    destination = models.ForeignKey(Destination, on_delete=models.CASCADE)
     description = models.TextField(max_length=5000, blank=True)
 
 

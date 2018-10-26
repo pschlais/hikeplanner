@@ -63,7 +63,7 @@ class RouteForm(forms.ModelForm):
         fields = '__all__'
 
 
-class RouteComboForm(forms.ModelForm):
+class RouteInDestComboForm(forms.ModelForm):
     """
     This form class is used in combination with creating a Destination.
     """
@@ -71,6 +71,27 @@ class RouteComboForm(forms.ModelForm):
         model = Route
         exclude = ['destination']
 
+
+    def __init__(self, trailhead_required, *args, **kwargs):
+
+        if type(trailhead_required) is not bool:
+            raise TypeError("trailhead_required must be True or False")
+
+        super().__init__(*args, **kwargs)
+        self.fields['trailhead'].required = trailhead_required
+
+    def reset_default_required_fields(self):
+        # Sets the route form to the default empty form state (existing trailhead not required, assume new trailhead will be input)
+        self.fields['trailhead'].required = False
+
+
+class RouteMainComboForm(forms.ModelForm):
+    """
+    This form class is used in combination with creating a trailhead.
+    """
+    class Meta:
+        model = Route
+        fields = '__all__'
 
     def __init__(self, trailhead_required, *args, **kwargs):
 
