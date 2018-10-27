@@ -144,47 +144,47 @@ def updateDriveTimeEntries(run_new=True, run_errors=False,
                     if apiParse["APIStatus"] != "OK":
                         # set entry to error, save error message
                         output_strings.append(
-                            "API error for " + qs[i_dest].majorcity.name + " : " +
-                            qs[i_dest].trailhead.name + " -- '" +
+                            "API error for " + sliced_qs[i_dest].majorcity.name + " : " +
+                            sliced_qs[i_dest].trailhead.name + " -- '" +
                             apiParse["APIMessage"] + "'")
 
-                        qs[i_dest].api_call_status = DriveTimeMajorCity.ERROR
-                        qs[i_dest].error_message = apiParse["APIMessage"]
-                        qs[i_dest].drive_distance = None
-                        qs[i_dest].drive_time = None
-                        qs[i_dest].save()
+                        sliced_qs[i_dest].api_call_status = DriveTimeMajorCity.ERROR
+                        sliced_qs[i_dest].error_message = apiParse["APIMessage"]
+                        sliced_qs[i_dest].drive_distance = None
+                        sliced_qs[i_dest].drive_time = None
+                        sliced_qs[i_dest].save()
 
                     else:  # overall API call returned data
                         if apiParse["dataStatus"] != "OK":
                             # set entry to error, save error message
                             output_strings.append(
-                                "Data error for " + qs[i_dest].majorcity.name +
-                                " : " + qs[i_dest].trailhead.name + " -- '" +
+                                "Data error for " + sliced_qs[i_dest].majorcity.name +
+                                " : " + sliced_qs[i_dest].trailhead.name + " -- '" +
                                 apiParse["dataMessage"] + "'")
 
-                            qs[i_dest].api_call_status = DriveTimeMajorCity.ERROR
-                            qs[i_dest].error_message = apiParse["dataMessage"]
-                            qs[i_dest].drive_distance = None
-                            qs[i_dest].drive_time = None
-                            qs[i_dest].save()
+                            sliced_qs[i_dest].api_call_status = DriveTimeMajorCity.ERROR
+                            sliced_qs[i_dest].error_message = apiParse["dataMessage"]
+                            sliced_qs[i_dest].drive_distance = None
+                            sliced_qs[i_dest].drive_time = None
+                            sliced_qs[i_dest].save()
 
                         else:
                             # data is valid, save results
                             output_strings.append(
-                                "VALID -- " + qs[i_dest].majorcity.name + " : " +
-                                qs[i_dest].trailhead.name + " -- '" +
+                                "VALID -- " + sliced_qs[i_dest].majorcity.name + " : " +
+                                sliced_qs[i_dest].trailhead.name + " -- '" +
                                 apiParse["dataMessage"] + "'")
 
                             output_strings.append("     distance: " +
                                 str(apiParse["distance"]["value"]) + ", time: " +
                                 str(apiParse["duration"]["value"]))
 
-                            qs[i_dest].api_call_status = DriveTimeMajorCity.OK
-                            qs[i_dest].error_message = ""
-                            qs[i_dest].drive_distance = apiParse["distance"]["value"]
-                            qs[i_dest].drive_time = apiParse["duration"]["value"]
-                            qs[i_dest].date_updated = date.today()
-                            qs[i_dest].save()
+                            sliced_qs[i_dest].api_call_status = DriveTimeMajorCity.OK
+                            sliced_qs[i_dest].error_message = ""
+                            sliced_qs[i_dest].drive_distance = apiParse["distance"]["value"]
+                            sliced_qs[i_dest].drive_time = apiParse["duration"]["value"]
+                            sliced_qs[i_dest].date_updated = date.today()
+                            sliced_qs[i_dest].save()
 
                             num_updated += 1
 
