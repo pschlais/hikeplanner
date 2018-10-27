@@ -110,7 +110,10 @@ def updateDriveTimeEntries(run_new=True, run_errors=False,
 
                 # create sliced queryset
                 if i_start + 1 == i_end:  # don't slice a single element
-                    sliced_qs = qs[i_start]
+                    # single queryset is not iterable, make it one by putting
+                    # it as an item in an array. Otherwise an error will be
+                    # thrown in the "for combo in sliced_qs" statement
+                    sliced_qs = [qs[i_start]]
                 else:
                     sliced_qs = qs[i_start:i_end]
 
