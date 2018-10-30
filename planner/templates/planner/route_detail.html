@@ -46,12 +46,12 @@
 
     <tr>
       <th scope="row">Location</th>
-      <td>{{route.county.state}}<br>{{route.county.name}} County</td>
+      <td>{{route.destination.county.state}}<br>{{route.destination.county.name}} County</td>
     </tr>
 
     <tr>
       <th scope="row">Jurisdiction</th>
-      <td>{{route.jurisdiction}}<br>{{route.jurisdiction.governing_body}}</td>
+      <td>{{route.destination.jurisdiction}}<br>{{route.destination.jurisdiction.governing_body}}</td>
     </tr>
   </table>
 {% endblock %}
@@ -101,21 +101,21 @@
   </div>
 
   <div class="row">
-    <section class="col dest-redtape">
-      <h2>Red Tape ({{route.jurisdiction}})</h2>
+    <section class="col route-redtape">
+      <h2>Red Tape ({{route.destination.jurisdiction}})</h2>
       <table class="table">
         <tr>
           <th scope="row">Parking</th>
-          {% if route.jurisdiction.parking_info %}
-            <td>{{route.jurisdiction.parking_info}}</td>
+          {% if route.destination.jurisdiction.parking_info %}
+            <td>{{route.destination.jurisdiction.parking_info}}</td>
           {% else %}
             <td>No information in database</td>
           {% endif %}
         </tr>
         <tr>
           <th scope="row">Camping</th>
-          {% if route.jurisdiction.camping_info %}
-            <td>{{route.jurisdiction.camping_info}}</td>
+          {% if route.destination.jurisdiction.camping_info %}
+            <td>{{route.destination.jurisdiction.camping_info}}</td>
           {% else %}
             <td>No information in database</td>
           {% endif %}

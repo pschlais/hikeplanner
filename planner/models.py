@@ -136,8 +136,6 @@ class Route(models.Model):
     class_rating = models.PositiveSmallIntegerField(choices=CLASS_RATING_CHOICES,
                                                     verbose_name="Class",
                                                     help_text="Yosemite Decimal System (1-5)")
-    county = models.ForeignKey('County', on_delete=models.SET_NULL, null=True)
-    jurisdiction = models.ForeignKey('Jurisdiction',on_delete=models.SET_NULL, null=True)
     destination = models.ForeignKey(Destination, on_delete=models.CASCADE)
     description = models.TextField(max_length=5000, blank=True)
 
