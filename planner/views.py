@@ -212,6 +212,10 @@ def _destination_route_trailhead_create_combo(request, useDestForm, template):
                 new_th = trailhead_form.save()
                 # add new trailhead to route
                 new_route.trailhead = new_th
+                # trigger major city drive time table row create function
+                updateTable.createNewDriveTimeEntries()
+                # trigger calculation of new drive times into database
+                updateTable.updateDriveTimeEntries(origin_type="trailhead")
 
             # if using existing trailhead, already in form object from request
             new_route.save()
@@ -370,7 +374,7 @@ class TrailheadCreate(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         # save TH to database
         th = form.save()
-        # trigger major city drive time table update functions
+        # trigger major city drive time table row create function
         updateTable.createNewDriveTimeEntries()
         # trigger calculation of new drive times into database
         updateTable.updateDriveTimeEntries(origin_type="trailhead")
