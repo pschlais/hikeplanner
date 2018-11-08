@@ -13,14 +13,35 @@
 
 {% block sidebar_content %}
   <div>
-    <p><a href="{% url 'destination-edit' pk=destination.pk %}" class="btn btn-primary">Edit Page</a></p>
+    <p>
+      <a href="{% url 'destination-edit' pk=destination.pk %}" class="btn btn-primary">Edit Page</a>
+      <a href="{% url 'destination-delete' pk=destination.pk %}" class="btn btn-danger">Delete Page</a>
+    </p>
     <p><a href="{% url 'route-add-combo' %}?destinationpk={{destination.pk}}" class="btn btn-primary">Add Route</a></p>
+    <p><a href="{% url 'destination-link-add' dest_pk=destination.pk %}" class="btn btn-primary">Add Link</a></p>
   </div>
   <h3>Relevant Links</h3>
   <ul>
-    <li><a href="#">Link 1</a></li>
-    <li><a href="#">Link 2</a></li>
-    <li><a href="#">User Links here</a></li>
+    {% for pub_link in public_links %}
+      <li><a href="{{pub_link.url}}" target="_blank">{{pub_link.label}}</a>
+        {% if perms.can_edit_destinationlink %}
+          (<a href="{{pub_link.get_edit_url}}">Edit</a>)
+          (<a href="{{pub_link.get_delete_url}}">X</a>)
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+
+  <ul>
+    {% if public_links %}<h4>Your Links</h4>{% endif %}
+    {% for pr_link in private_links %}
+      <li><a href="{{pr_link.url}}" target="_blank">{{pr_link.label}}</a>
+        (<a href="{{pr_link.get_edit_url}}">Edit</a>)
+        (<a href="{{pr_link.get_delete_url}}">X</a>)
+      </li>
+    {% empty %}
+      <li>No links saved.</li>
+    {% endfor %}
   </ul>
   <h3>User Tags</h3>
   <ul>
@@ -60,7 +81,7 @@
 {% block detail_map_embed %}
   <img src="{{destination.google_maps_embed_url}}">
   {# <img src="{% static 'planner/img/staticmap.png' %}"> #}
-  <p><a href="{{destination.google_maps_embed_url}}">Destination static map</a></p>
+  {# <p><a href="{{destination.google_maps_embed_url}}">Destination static map</a></p> #}
 {% endblock %}
 
 
@@ -81,13 +102,6 @@
   {% endif %}
 
   <div class="row">
-    <section class="col dest-weather">
-      {% include "planner/_weather_tabs.html" with weather_by_day=weather_by_day %}
-    </section>
-  </div>
-
-
-  <div class="row">
     <section class="col dest-routes">
       {% with routes=destination.route_set.all %}
         <h2>Routes ({{routes | length}})</h2>
@@ -103,6 +117,13 @@
         {% endif %}
 
       {% endwith %}
+    </section>
+  </div>
+
+  <div class="row">
+    <section class="col dest-weather">
+      <h2>Weather</h2>
+      {% include "planner/_weather_tabs.html" with weather_by_day=weather_by_day %}
     </section>
   </div>
 

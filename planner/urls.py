@@ -1,40 +1,61 @@
-from django.urls import path
+from django.urls import include, path
 from . import views
 
 urlpatterns = [
     path('', views.home_view, name='planner-home'),
 
-    path('destinations/', views.DestinationListView.as_view(),
-         name='destination-list'),
-    path('destination/<int:pk>/', views.DestinationDetailView.as_view(),
-         name='destination-detail'),
-    path('destination/add/', views.DestinationCreate.as_view(),
-         name='destination-add'),
-    path('destination/add_combo/', views.destination_create_combo,
-         name='destination-add-combo'),
-    path('destination/<int:pk>/edit/', views.DestinationUpdate.as_view(),
-         name='destination-edit'),
-    path('destination/<int:pk>/delete/', views.DestinationDelete.as_view(),
-         name='destination-delete'),
-    path('destination/search/', views.DestinationSearchView.as_view(),
-         name='destination-search'),
-    # provide another permutation of destination search, no name hook
-    path('destinations/search/', views.DestinationSearchView.as_view()),
+    path('destination/', include([
+            path('', views.DestinationListView.as_view(),
+                 name='destination-list'),
 
-    path('routes/', views.RouteListView.as_view(),
-         name='route-list'),
-    path('route/<int:pk>/', views.RouteDetailView.as_view(),
-         name='route-detail'),
-    path('route/add/', views.RouteCreate.as_view(),
-         name='route-add'),
-    path('route/add_combo/', views.route_create_combo,
-         name='route-add-combo'),
-    path('route/<int:pk>/edit/', views.RouteUpdate.as_view(),
-         name='route-edit'),
-    path('route/<int:pk>/delete/', views.RouteDelete.as_view(),
-         name='route-delete'),
+            path('add/', views.destination_create_combo,
+                 name='destination-add-combo'),
+            path('search/', views.DestinationSearchView.as_view(),
+                 name='destination-search'),
+            # ----- detail pages
+            path('<int:pk>/', views.DestinationDetailView.as_view(),
+                 name='destination-detail'),
+            path('<int:pk>/edit/', views.DestinationUpdate.as_view(),
+                 name='destination-edit'),
+            path('<int:pk>/delete/', views.DestinationDelete.as_view(),
+                 name='destination-delete'),
+            # ------ links
+            path('<int:dest_pk>/link/add/', views.destination_create_link,
+                 name='destination-link-add'),
+            path('<int:dest_pk>/link/<int:link_pk>/edit/', views.destination_edit_link,
+                 name='destination-link-edit'),
+            path('<int:dest_pk>/link/<int:link_pk>/delete/', views.destination_delete_link,
+                 name='destination-link-delete'),
 
-    path('trailheads/', views.TrailheadListView.as_view(),
+            # path('destination/add_combo/', views.destination_create_combo,
+            #      name='destination-add-combo'),
+        ])),
+    # # provide another permutation of destination search, no name hook
+    # path('destinations/search/', views.DestinationSearchView.as_view()),
+
+    path('route/', include([
+            path('', views.RouteListView.as_view(), name='route-list'),
+            path('add/', views.route_create_combo,
+                 name='route-add-combo'),
+
+            path('<int:pk>/', views.RouteDetailView.as_view(),
+                 name='route-detail'),
+            # path('add_combo/', views.route_create_combo,
+            #      name='route-add-combo'),
+            path('<int:pk>/edit/', views.RouteUpdate.as_view(),
+                 name='route-edit'),
+            path('<int:pk>/delete/', views.RouteDelete.as_view(),
+                 name='route-delete'),
+
+            path('<int:route_pk>/link/add/', views.route_create_link,
+                 name='route-link-add'),
+            path('<int:route_pk>/link/<int:link_pk>/edit/',
+                 views.route_edit_link, name='route-link-edit'),
+            path('<int:route_pk>/link/<int:link_pk>/delete/',
+                 views.route_delete_link, name='route-link-delete'),
+        ])),
+
+    path('trailhead/', views.TrailheadListView.as_view(),
          name='trailhead-list'),
     path('trailhead/<int:pk>/', views.TrailheadDetailView.as_view(),
          name='trailhead-detail'),

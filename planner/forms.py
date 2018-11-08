@@ -1,5 +1,7 @@
 from django import forms
+from django.forms import widgets
 from .models import Profile, Destination, Route, GoverningBody, Jurisdiction, Trailhead
+from .models import Link
 
 
 # Form classes
@@ -144,3 +146,30 @@ class GoverningBodyForm(forms.ModelForm):
     class Meta:
         model = GoverningBody
         fields = '__all__'
+
+
+class LinkBaseForm(forms.Form):
+    """
+    This form class generates the visible fields of the Link abstract model.
+    The logic of which version of the form to render must be in the logic of
+    the view.
+    """
+    label = forms.CharField(max_length=Link.LABEL_MAX_LENGTH)
+    url = forms.URLField()
+    # link type defaults to private, becomes disabled for those without access
+    link_type = forms.ChoiceField(choices=Link.LINK_TYPES, initial=Link.PRIVATE)
+
+    def __init__(self, *args, user_is_admin=False, **kwargs):
+        # call parent constructor
+        super().__init__(*args, **kwargs)
+        # adjust inputs based on user privileges
+        if not user_is_admin:
+            # make link type disabled and hidden
+            self.fields['link_type'].disabled = True
+            self.fields['link_type'].widget = widgets.MultipleHiddenInput()
+
+
+
+
+
+

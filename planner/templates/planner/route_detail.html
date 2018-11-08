@@ -3,19 +3,34 @@
 
 {% block sidebar_content %}
   <div>
-    <p><a href="{% url 'route-edit' pk=route.pk %}" class="btn btn-primary">Edit Page</a></p>
-    Buttons here
+    <p>
+      <a href="{% url 'route-edit' pk=route.pk %}" class="btn btn-primary">Edit Page</a>
+      <a href="{% url 'route-delete' pk=route.pk %}" class="btn btn-danger">Delete Page</a>
+    </p>
+    <p><a href="{% url 'route-link-add' route_pk=route.pk %}" class="btn btn-primary">Add Link</a></p>
   </div>
   <h3>Relevant Links</h3>
   <ul>
-    <li><a href="#">Link 1</a></li>
-    <li><a href="#">Link 2</a></li>
-    <li><a href="#">User Links here</a></li>
+    {% for pub_link in public_links %}
+      <li><a href="{{pub_link.url}}" target="_blank">{{pub_link.label}}</a>
+        {% if perms.can_edit_routelink %}
+          (<a href="{{pub_link.get_edit_url}}">Edit</a>)
+          (<a href="{{pub_link.get_delete_url}}">X</a>)
+        {% endif %}
+      </li>
+    {% endfor %}
   </ul>
-  <h3>User Tags</h3>
+
   <ul>
-    <li>Tag 1</li>
-    <li>Tag 2</li>
+    {% if public_links %}<h4>Your Links</h4>{% endif %}
+    {% for pr_link in private_links %}
+      <li><a href="{{pr_link.url}}" target="_blank">{{pr_link.label}}</a>
+        (<a href="{{pr_link.get_edit_url}}">Edit</a>)
+        (<a href="{{pr_link.get_delete_url}}">X</a>)
+      </li>
+    {% empty %}
+      <li>No links saved.</li>
+    {% endfor %}
   </ul>
 {% endblock %}
 
@@ -45,6 +60,11 @@
     </tr>
 
     <tr>
+      <th scope="row">Trailhead</th>
+      <td><a href="{{route.trailhead.get_absolute_url}}">{{route.trailhead.name}}</a></td>
+    </tr>
+
+    <tr>
       <th scope="row">Location</th>
       <td>{{route.destination.county.state}}<br>{{route.destination.county.name}} County</td>
     </tr>
@@ -66,28 +86,6 @@
 
 
 {% block detail_below_fold %}
-  <div class="row">
-    {% if route.description %}
-      <section class="col route-subsection">
-        <h2>Description</h2>
-        <p>{{route.description}}</p>
-      </section>
-    {% endif %}
-
-    <section class="col route-weather">
-      This is a placeholder for weather point forecast
-    </section>
-  </div>
-
-  <div class="row">
-    <section class="col route-trailhead">
-      <h2>Trailhead</h2>
-      <ul>
-        <li><a href="{{route.trailhead.get_absolute_url}}">{{route.trailhead.name}}</a></li>
-      </ul>
-    </section>
-  </div>
-
 
   <div class="row">
     <section class="col route-destinations">
@@ -101,24 +99,32 @@
   </div>
 
   <div class="row">
+    {% if route.description %}
+      <section class="col route-subsection">
+        <h2>Description</h2>
+        <p>{{route.description}}</p>
+      </section>
+    {% endif %}
+  </div>
+
+  <div class="row">
+    <section class="col route-weather">
+      <h2>Weather</h2>
+      {% include "planner/_weather_tabs.html" with weather_by_day=weather_by_day %}
+    </section>
+  </div>
+
+  <div class="row">
     <section class="col route-redtape">
       <h2>Red Tape ({{route.destination.jurisdiction}})</h2>
       <table class="table">
         <tr>
           <th scope="row">Parking</th>
-          {% if route.destination.jurisdiction.parking_info %}
-            <td>{{route.destination.jurisdiction.parking_info}}</td>
-          {% else %}
-            <td>No information in database</td>
-          {% endif %}
+            <td>{{route.destination.jurisdiction.parking_info|default:"No information in database"}}</td>
         </tr>
         <tr>
           <th scope="row">Camping</th>
-          {% if route.destination.jurisdiction.camping_info %}
-            <td>{{route.destination.jurisdiction.camping_info}}</td>
-          {% else %}
-            <td>No information in database</td>
-          {% endif %}
+            <td>{{route.destination.jurisdiction.camping_info|default:"No information in database"}}</td>
         </tr>
       </table>
     </section>

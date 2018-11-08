@@ -41,8 +41,7 @@ class Destination(models.Model):
                                  verbose_name='Destination Type')
     jurisdiction = models.ForeignKey('Jurisdiction',on_delete=models.SET_NULL, null=True)
     description = models.TextField(max_length=5000, blank=True)
-    # link_public = GenericRelation('PublicLink',
-    #                               related_query_name='destination')
+
 
     # ---- METADATA ----------------
     class Meta:
@@ -429,15 +428,54 @@ def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 
 
-class PublicLink(models.Model):
+# ---------- Links ------------------------------------
+class Link(models.Model):
     """
-    Model representing a link on a page that any user of the site can see.
+    Model representing a link on a page. No restrictions on who can see it.
     """
-    label = models.CharField(max_length=50)
+    PUBLIC = 'PU'
+    PRIVATE = 'PR'
+    LINK_TYPES = ((PUBLIC, "Public"), (PRIVATE, "Private"))
+    LABEL_MAX_LENGTH = 50
+
+    # These properties are placeholders for child models. They must be defined
+    # inside of the child models.
+    edit_url_name = ''
+    delete_url_name = ''
+
+    label = models.CharField(max_length=LABEL_MAX_LENGTH)
     url = models.URLField()
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
-    content_object = GenericForeignKey('content_type', 'object_id')
+    link_type = models.CharField(max_length=2, choices=LINK_TYPES)
+    user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
+    # CHILD MODEL MUST IMPLEMENT THE FOLLOWING FIELD:
+    # owner_model = models.ForeignKey(Model, verbose_name, on_delete)
+
+    class Meta:
+        abstract = True
+
+    def get_edit_url(self):
+        return reverse(self.edit_url_name,
+                       args=[self.owner_model.pk, self.pk])
+
+    def get_delete_url(self):
+        return reverse(self.delete_url_name,
+                       args=[self.owner_model.pk, self.pk])
 
     def __str__(self):
-        return "({0}) {1}".format(self.label, self.url)
+        return "{0} ({1})".format(self.label, self.url)
+
+
+class DestinationLink(Link):
+    edit_url_name = "destination-link-edit"
+    delete_url_name = "destination-link-delete"
+
+    owner_model = models.ForeignKey(Destination, verbose_name="Destination",
+                                    on_delete=models.CASCADE)
+
+
+class RouteLink(Link):
+    edit_url_name = "route-link-edit"
+    delete_url_name = "route-link-delete"
+
+    owner_model = models.ForeignKey(Route, verbose_name="Route",
+                                    on_delete=models.CASCADE)

@@ -1,0 +1,10 @@
+{# Standard link view delete confirmation form #}
+{% extends "planner/__base.html" %}
+
+{% block main_content %}
+  <p>Are you sure you want to delete "{{link.label}}"? ({{link.url}})</p>
+  <form method="post">{% csrf_token %}
+    <input type="submit" value="Confirm">
+    <a class="btn btn-secondary" href="{{owner.get_absolute_url}}">Cancel</a>
+  </form>
+{% endblock %}

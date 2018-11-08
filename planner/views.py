@@ -1,25 +1,25 @@
 from django.shortcuts import render, redirect
 from django.views import generic
 from django.urls import reverse, reverse_lazy
-from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from .models import Destination, Route, Trailhead, Profile, GoverningBody
-from django.db.models import Q, F
+from .models import Link, DestinationLink, RouteLink
+from django.db.models import F
 from .models import Jurisdiction, DriveTimeMajorCity
 from .forms import ProfileForm, RouteForm, TrailheadForm, DestinationSearchForm
 from .forms import DestinationForm
 from .forms import RouteInDestComboForm, RouteMainComboForm
 from .forms import TrailheadComboForm
+from .forms import LinkBaseForm
 from .PlannerUtils import constructURL
 from .PlannerUtils import accessAPI
 from .PlannerUtils import parseAPI
 from .PlannerUtils import updateTable
 from .PlannerUtils import conversions
-import json
-import math
 
 
 # Create your views here.
@@ -146,6 +146,10 @@ class DestinationDetailView(LoginRequiredMixin, generic.DetailView):
         weather_raw_data = accessAPI.NOAA_API(noaa_api_url)
         weather_data_by_day = parseAPI.NOAA_by_day(weather_raw_data)
         context['weather_by_day'] = weather_data_by_day
+
+        # get links
+        context['public_links'] = DestinationLink.objects.filter(owner_model=self.object, link_type=Link.PUBLIC)
+        context['private_links'] = DestinationLink.objects.filter(owner_model=self.object, link_type=Link.PRIVATE, user=self.request.user)
 
         return context
 
@@ -287,6 +291,23 @@ class RouteListView(LoginRequiredMixin, generic.ListView):
 class RouteDetailView(LoginRequiredMixin, generic.DetailView):
     model = Route
 
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+
+        # call NOAA forecast API
+        noaa_api_url = self.object.destination.noaa_api_url
+        context['noaa_api_url'] = noaa_api_url
+        weather_raw_data = accessAPI.NOAA_API(noaa_api_url)
+        weather_data_by_day = parseAPI.NOAA_by_day(weather_raw_data)
+        context['weather_by_day'] = weather_data_by_day
+
+        # get links
+        context['public_links'] = RouteLink.objects.filter(owner_model=self.object, link_type=Link.PUBLIC)
+        context['private_links'] = RouteLink.objects.filter(owner_model=self.object, link_type=Link.PRIVATE, user=self.request.user)
+
+        return context
+
 
 class RouteCreate(CreateView):
     model = Route
@@ -379,7 +400,7 @@ class TrailheadCreate(LoginRequiredMixin, CreateView):
         # trigger calculation of new drive times into database
         updateTable.updateDriveTimeEntries(origin_type="trailhead")
         # redirect to newly-created trailhead detail page
-        return HttpResponseRedirect(reverse('trailhead-detail',
+        return redirect(reverse('trailhead-detail',
                                             args=[str(th.pk)]))
 
 
@@ -400,7 +421,7 @@ class TrailheadUpdate(LoginRequiredMixin, UpdateView):
             # trigger calculation of new drive times into database
             updateTable.updateDriveTimeEntries()
         # redirect to newly-created trailhead detail page
-        return HttpResponseRedirect(self.get_object().get_absolute_url())
+        return redirect(self.get_object().get_absolute_url())
 
 
 class TrailheadDelete(LoginRequiredMixin, DeleteView):
@@ -477,7 +498,7 @@ def profile_update(request):
         if form.is_valid():
             # save data
             form.save()
-            return HttpResponseRedirect(reverse('profile-detail'))
+            return redirect(reverse('profile-detail'))
 
     # create default form for GET or other method
     else:
@@ -485,3 +506,184 @@ def profile_update(request):
 
     return render(request, "planner/profile_update.html", {'form': form})
 
+
+# ---------- Public Link views ----------------------
+def base_create_edit_link(request, base_model, base_model_pk,
+                          link_model, link_model_pk=None):
+
+    denied_perm_template = "planner/denied_permission.html"
+    link_form_template = "planner/link_form.html"
+
+    # get link model name from ContentType object
+    link_model_name = ContentType.objects.get_for_model(link_model).model
+    if link_model_pk:  # link is being edited
+        edit_type = "change"
+        link = link_model.objects.get(pk=link_model_pk)
+    else:  # link is being created
+        edit_type = "add"
+
+    # get model instance the link is related to
+    owner_model = base_model.objects.get(pk=base_model_pk)
+
+    # get privilege of user
+    has_perm = request.user.has_perm("planner.{0}_{1}".format(
+                                        edit_type, link_model_name))
+
+    # process form data from POST request
+    if request.method == "POST":
+
+        # deny permission for unauthorized change/add requests
+        if edit_type == "change":
+            # deny change access for public links for users without permissions
+            if link.link_type == Link.PUBLIC and not has_perm:
+                return render(request, denied_perm_template)
+            # deny change access of private links for other users' private
+            # links, unless the user has admin link permissions
+            elif (link.link_type == Link.PRIVATE and
+                  link.user != request.user and not has_perm):
+                return render(request, denied_perm_template)
+
+        # create form instance and populate it
+        form = LinkBaseForm(request.POST, user_is_admin=has_perm)
+
+        if form.is_valid():
+            # take cleaned data from form and populate link object
+            if edit_type == "change":
+                link.label = form.cleaned_data['label']
+                link.url = form.cleaned_data['url']
+                link.link_type = form.cleaned_data['link_type']
+                # public link has no attached user, private does
+                if form.cleaned_data['link_type'] == Link.PUBLIC:
+                    link.user = None
+                else:
+                    link.user = request.user
+                # owner model is already set, not meant to be changed
+
+                link.save()
+
+            else:  # edit_type == "add"
+                # populate new link
+                if form.cleaned_data['link_type'] == Link.PUBLIC:
+                    # prevent unauthorized user from POSTing a new public link
+                    if not has_perm:
+                        return render(request, denied_perm_template)
+                    # otherwise, valid. Set null user for public links.
+                    link_user = None
+                else:
+                    link_user = request.user
+                new_link = link_model(label=form.cleaned_data['label'],
+                                url=form.cleaned_data['url'],
+                                link_type=form.cleaned_data['link_type'],
+                                user=link_user,
+                                owner_model=owner_model)
+                new_link.save()
+
+            # redirect to owning page
+            return redirect(owner_model.get_absolute_url())
+
+    elif request.method == "GET":
+
+        # create form instance. Blank for create, with data for edit
+        initial = {}
+
+        if edit_type == "change":
+            # deny change access for public links for users without permissions
+            if link.link_type == Link.PUBLIC and not has_perm:
+                return render(request, denied_perm_template)
+            # deny change access of private links for other users' private
+            # links, unless the user has admin link permissions
+            elif (link.link_type == Link.PRIVATE and
+                  link.user != request.user and not has_perm):
+                return render(request, denied_perm_template)
+
+            else:  # change access granted
+                initial['label'] = link.label
+                initial['url'] = link.url
+                initial['link_type'] = link.link_type
+
+        form = LinkBaseForm(user_is_admin=has_perm, initial=initial)
+
+    else:  # default all other request methods to empty form
+        form = LinkBaseForm(user_is_admin=has_perm)
+
+    return render(request, link_form_template, {"form": form})
+
+
+def base_delete_link(request, link_model, link_model_pk):
+    denied_perm_template = "planner/denied_permission.html"
+    link_delete_template = "planner/link_delete.html"
+
+    # get object instances for base model and link
+    link = link_model.objects.get(pk=link_model_pk)
+    owner = link.owner_model
+
+    # get link model name from ContentType object
+    link_model_name = ContentType.objects.get_for_model(link_model).model
+
+    # check user for admin link delete privileges
+    has_perm = request.user.has_perm("planner.delete_{0}".format(
+                                                link_model_name))
+
+    if request.method == "POST":
+        # check permissions before allowing delete
+        if has_perm:
+            # admin deleting public (or private) link
+            link.delete()
+            return redirect(owner.get_absolute_url())
+
+        if link.link_type == Link.PRIVATE and request.user == link.user:
+            # user deleting their own private link
+            link.delete()
+            return redirect(owner.get_absolute_url())
+
+        # else: user does not have permission to delete the current link
+        return render(request, denied_perm_template)
+
+    else:  # treat everything else like a "GET" request
+        # check permissions before allowing delete
+        if has_perm:
+            # admin deleting public (or private) link
+            return render(request, link_delete_template, {'link': link,
+                          'owner': owner})
+
+        if link.link_type == Link.PRIVATE and request.user == link.user:
+            # user deleting their own private link
+            return render(request, link_delete_template, {'link': link,
+                          'owner': owner})
+
+        # else: user does not have permission to delete the current link
+        return render(request, denied_perm_template)
+
+
+@login_required
+def destination_create_link(request, dest_pk):
+    return base_create_edit_link(request, Destination, dest_pk,
+                                 DestinationLink)
+
+
+@login_required
+def destination_edit_link(request, dest_pk, link_pk):
+    return base_create_edit_link(request, Destination, dest_pk,
+                                 DestinationLink, link_pk)
+
+
+@login_required
+def destination_delete_link(request, dest_pk, link_pk):
+    return base_delete_link(request, DestinationLink, link_pk)
+
+
+@login_required
+def route_create_link(request, route_pk):
+    return base_create_edit_link(request, Route, route_pk,
+                                 RouteLink)
+
+
+@login_required
+def route_edit_link(request, route_pk, link_pk):
+    return base_create_edit_link(request, Route, route_pk,
+                                 RouteLink, link_pk)
+
+
+@login_required
+def route_delete_link(request, route_pk, link_pk):
+    return base_delete_link(request, RouteLink, link_pk)
