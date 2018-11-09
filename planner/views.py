@@ -5,13 +5,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from dal import autocomplete
 from .models import Destination, Route, Trailhead, Profile, GoverningBody
 from .models import Link, DestinationLink, RouteLink
 from django.db.models import F
 from .models import Jurisdiction, DriveTimeMajorCity
 from .forms import ProfileForm, TrailheadForm, DestinationSearchForm
 from .forms import DestinationForm
-from .forms import RouteInDestComboForm, RouteMainComboForm
+from .forms import RouteForm, RouteInDestComboForm, RouteMainComboForm
 from .forms import TrailheadComboForm
 from .forms import LinkBaseForm
 from .PlannerUtils import constructURL
@@ -27,9 +28,33 @@ def home_view(request):
     return render(request, 'planner_home.html')
 
 
+# -------- Parent Autocomplete class ---------------
+class BaseSelectAutocomplete(autocomplete.Select2QuerySetView):
+    """
+    Base class to create 'select' autocomplete views.
+    Inheriting models MUST implement an instance attribute "self.model", which
+    is a Model class defined in "models.py".
+    """
+
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            # do not return results for non-logged in visitors
+            return self.model.objects.none()
+
+        # get all objects first
+        qs = self.model.objects.all()
+
+        # filter if values are present
+        if self.q:
+            qs = qs.filter(name__icontains=self.q)
+
+        return qs
+
+
 # -------- Destination views ------------------------
 class DestinationListView(LoginRequiredMixin, generic.ListView):
     model = Destination
+
 
 class DestinationSearchView(LoginRequiredMixin, generic.ListView):
     """
@@ -41,7 +66,6 @@ class DestinationSearchView(LoginRequiredMixin, generic.ListView):
     model = Route
     search_form_class = DestinationSearchForm
     template_name = 'planner/destination_search_list.html'
-
 
     def get_queryset(self):
 
@@ -121,15 +145,11 @@ class DestinationSearchView(LoginRequiredMixin, generic.ListView):
 
         return out_dict
 
-
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["search_form"] = self.search_form_class(self.request.GET)
 
         return context
-
-
 
 
 class DestinationDetailView(LoginRequiredMixin, generic.DetailView):
@@ -269,9 +289,6 @@ def _destination_route_trailhead_create_combo(request, useDestForm, template):
     return render(request, template, context_dict)
 
 
-
-
-
 class DestinationUpdate(LoginRequiredMixin, UpdateView):
     model = Destination
     fields = '__all__'
@@ -280,6 +297,11 @@ class DestinationUpdate(LoginRequiredMixin, UpdateView):
 class DestinationDelete(LoginRequiredMixin, DeleteView):
     model = Destination
     success_url = reverse_lazy('destination-list')
+
+
+# Autocomplete query view
+class DestinationAutocomplete(BaseSelectAutocomplete):
+    model = Destination
 
 
 # ------- Route views ------------------------------
@@ -334,12 +356,17 @@ def route_create_combo(request):
 
 class RouteUpdate(LoginRequiredMixin, UpdateView):
     model = Route
-    fields = '__all__'
+    form_class = RouteForm
 
 
 class RouteDelete(LoginRequiredMixin, DeleteView):
     model = Route
     success_url = reverse_lazy('route-list')
+
+
+# Autocomplete query view
+class RouteAutocomplete(BaseSelectAutocomplete):
+    model = Route
 
 
 # ------- Trailhead views --------------------------
@@ -426,6 +453,11 @@ class TrailheadUpdate(LoginRequiredMixin, UpdateView):
 class TrailheadDelete(LoginRequiredMixin, DeleteView):
     model = Trailhead
     success_url = reverse_lazy('trailhead-list')
+
+
+# Autocomplete query view
+class TrailheadAutocomplete(BaseSelectAutocomplete):
+    model = Trailhead
 
 
 # -------- Governing Body views --------------------

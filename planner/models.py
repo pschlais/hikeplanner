@@ -45,7 +45,7 @@ class Destination(models.Model):
 
     # ---- METADATA ----------------
     class Meta:
-        pass
+        ordering = ['name']
 
     # ---- METHODS -------------------
     def get_absolute_url(self):
@@ -141,7 +141,7 @@ class Route(models.Model):
 
     # ----- METADATA --------------
     class Meta:
-        pass
+        ordering = ['name']
 
     # ----- METHODS ----------------
     def get_absolute_url(self):
@@ -198,7 +198,7 @@ class Jurisdiction(models.Model):
 
     # ----- METADATA --------------
     class Meta:
-        pass
+        ordering = ['name']
 
     # ----- METHODS ----------------
     def get_absolute_url(self):
@@ -234,7 +234,7 @@ class GoverningBody(models.Model):
 
     # ----- METADATA --------------
     class Meta:
-        pass
+        ordering = ['name']
 
     # ----- METHODS ----------------
     def get_absolute_url(self):
@@ -264,7 +264,7 @@ class Trailhead(models.Model):
 
     # ----- METADATA --------------
     class Meta:
-        pass
+        ordering = ['name']
 
     # ----- METHODS ----------------
     def get_absolute_url(self):
@@ -452,6 +452,7 @@ class Link(models.Model):
 
     class Meta:
         abstract = True
+        ordering = ["label"]
 
     def get_edit_url(self):
         return reverse(self.edit_url_name,

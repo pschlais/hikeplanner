@@ -8,3 +8,9 @@
   {% include "planner/_detail_form.html" with form=form %}
 
 {% endblock main_content %}
+
+
+{% block javascript_footer %}
+  {{block.super}}
+  {{form.media}}
+{% endblock %}

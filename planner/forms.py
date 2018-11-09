@@ -1,5 +1,6 @@
 from django import forms
 from django.forms import widgets
+from dal import autocomplete
 from .models import Profile, Destination, Route, GoverningBody, Jurisdiction, Trailhead
 from .models import Link
 
@@ -64,6 +65,11 @@ class RouteForm(forms.ModelForm):
     class Meta:
         model = Route
         fields = '__all__'
+        widgets = {
+            'destination': autocomplete.ModelSelect2(url='destination-autocomplete'),
+            'trailhead': autocomplete.ModelSelect2(url='trailhead-autocomplete'),
+        }
+
 
 
 class RouteInDestComboForm(forms.ModelForm):
@@ -73,6 +79,9 @@ class RouteInDestComboForm(forms.ModelForm):
     class Meta:
         model = Route
         exclude = ['destination']
+        widgets = {
+            'trailhead': autocomplete.ModelSelect2(url='trailhead-autocomplete'),
+        }
 
 
     def __init__(self, trailhead_required, *args, **kwargs):
@@ -95,6 +104,11 @@ class RouteMainComboForm(forms.ModelForm):
     class Meta:
         model = Route
         fields = '__all__'
+        widgets = {
+            'destination': autocomplete.ModelSelect2(url='destination-autocomplete'),
+            'trailhead': autocomplete.ModelSelect2(url='trailhead-autocomplete'),
+        }
+
 
     def __init__(self, trailhead_required, *args, **kwargs):
 
@@ -105,7 +119,8 @@ class RouteMainComboForm(forms.ModelForm):
         self.fields['trailhead'].required = trailhead_required
 
     def reset_default_required_fields(self):
-        # Sets the route form to the default empty form state (existing trailhead not required, assume new trailhead will be input)
+        # Sets the route form to the default empty form state (existing
+        # trailhead not required, assume new trailhead will be input)
         self.fields['trailhead'].required = False
 
 
@@ -163,9 +178,5 @@ class LinkBaseForm(forms.ModelForm):
             # make link type disabled and hidden
             self.fields['link_type'].disabled = True
             self.fields['link_type'].widget = widgets.MultipleHiddenInput()
-
-
-
-
 
 

@@ -13,6 +13,7 @@
         <p>Add a new trailhead?</p>
         <input type="radio" name="add_trailhead" value="Yes" checked>Yes<br>
         <input type="radio" name="add_trailhead" value="No">No<br>
+        <p>("Yes" will ignore trailhead input above, "No" will ignore trailhead input below)</p>
         <h1>Trailhead</h1>
         {{ trailhead_form.as_p }}
         <input type="submit" value="Create" />
@@ -21,3 +22,8 @@
   </div>
 
 {% endblock main_content %}
+
+{% block javascript_footer %}
+  {{ block.super }}
+  {{ route_form.media }}
+{% endblock %}

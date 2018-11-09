@@ -29,7 +29,7 @@ urlpatterns = [
 
             # path('destination/add_combo/', views.destination_create_combo,
             #      name='destination-add-combo'),
-        ])),
+    ])),
     # # provide another permutation of destination search, no name hook
     # path('destinations/search/', views.DestinationSearchView.as_view()),
 
@@ -53,7 +53,7 @@ urlpatterns = [
                  views.route_edit_link, name='route-link-edit'),
             path('<int:route_pk>/link/<int:link_pk>/delete/',
                  views.route_delete_link, name='route-link-delete'),
-        ])),
+    ])),
 
     path('trailhead/', views.TrailheadListView.as_view(),
          name='trailhead-list'),
@@ -90,4 +90,14 @@ urlpatterns = [
 
     path('profile/', views.profile_overview, name='profile-detail'),
     path('profile/edit/', views.profile_update, name='profile-update'),
+
+    # Autocomplete helper views
+    path('autocomplete/', include([
+            path('destination/', views.DestinationAutocomplete.as_view(),
+                 name='destination-autocomplete'),
+            path('route/', views.RouteAutocomplete.as_view(),
+                 name='route-autocomplete'),
+            path('trailhead/', views.TrailheadAutocomplete.as_view(),
+                 name='trailhead-autocomplete'),
+    ])),
 ]
