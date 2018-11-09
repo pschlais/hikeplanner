@@ -16,6 +16,7 @@ class DestinationForm(forms.ModelForm):
         model = Destination
         fields = '__all__'
 
+
 class DestinationSearchForm(forms.Form):
     min_length = forms.DecimalField(min_value=0, decimal_places=1, required=False, label="Min Length [mi]")
     max_length = forms.DecimalField(min_value=0, decimal_places=1, required=False, label="Max Length [mi]")
@@ -136,28 +137,23 @@ class TrailheadComboForm(TrailheadForm):
             self.fields[field].required = False
 
 
-class JurisdictionForm(forms.ModelForm):
-    class Meta:
-        model = Jurisdiction
-        fields = '__all__'
-
-
-class GoverningBodyForm(forms.ModelForm):
-    class Meta:
-        model = GoverningBody
-        fields = '__all__'
-
-
-class LinkBaseForm(forms.Form):
+class LinkBaseForm(forms.ModelForm):
     """
     This form class generates the visible fields of the Link abstract model.
     The logic of which version of the form to render must be in the logic of
     the view.
     """
-    label = forms.CharField(max_length=Link.LABEL_MAX_LENGTH)
-    url = forms.URLField()
+    # label = forms.CharField(max_length=Link.LABEL_MAX_LENGTH)
+    # url = forms.URLField()
+
     # link type defaults to private, becomes disabled for those without access
-    link_type = forms.ChoiceField(choices=Link.LINK_TYPES, initial=Link.PRIVATE)
+    link_type = forms.ChoiceField(choices=Link.LINK_TYPES,
+                                  initial=Link.PRIVATE)
+
+    class Meta:
+        model = Link
+        exclude = ['user']
+
 
     def __init__(self, *args, user_is_admin=False, **kwargs):
         # call parent constructor

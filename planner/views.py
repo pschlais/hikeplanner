@@ -4,13 +4,12 @@ from django.urls import reverse, reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-from django.contrib.contenttypes.models import ContentType
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from .models import Destination, Route, Trailhead, Profile, GoverningBody
 from .models import Link, DestinationLink, RouteLink
 from django.db.models import F
 from .models import Jurisdiction, DriveTimeMajorCity
-from .forms import ProfileForm, RouteForm, TrailheadForm, DestinationSearchForm
+from .forms import ProfileForm, TrailheadForm, DestinationSearchForm
 from .forms import DestinationForm
 from .forms import RouteInDestComboForm, RouteMainComboForm
 from .forms import TrailheadComboForm
@@ -514,8 +513,8 @@ def base_create_edit_link(request, base_model, base_model_pk,
     denied_perm_template = "planner/denied_permission.html"
     link_form_template = "planner/link_form.html"
 
-    # get link model name from ContentType object
-    link_model_name = ContentType.objects.get_for_model(link_model).model
+    # get link model name
+    link_model_name = link_model.__name__.lower()
     if link_model_pk:  # link is being edited
         edit_type = "change"
         link = link_model.objects.get(pk=link_model_pk)
@@ -617,8 +616,8 @@ def base_delete_link(request, link_model, link_model_pk):
     link = link_model.objects.get(pk=link_model_pk)
     owner = link.owner_model
 
-    # get link model name from ContentType object
-    link_model_name = ContentType.objects.get_for_model(link_model).model
+    # get link model name
+    link_model_name = link_model.__name__.lower()
 
     # check user for admin link delete privileges
     has_perm = request.user.has_perm("planner.delete_{0}".format(
