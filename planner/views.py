@@ -55,6 +55,14 @@ class BaseSelectAutocomplete(autocomplete.Select2QuerySetView):
 class DestinationListView(LoginRequiredMixin, generic.ListView):
     model = Destination
 
+    def get_queryset(self):
+        dest_name = self.request.GET.get("dest_name", "")
+        if dest_name:
+            return Destination.objects.filter(name__icontains=dest_name)
+        else:
+            return Destination.objects.all()
+
+
 
 class DestinationSearchView(LoginRequiredMixin, generic.ListView):
     """

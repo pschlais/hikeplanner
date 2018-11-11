@@ -6,12 +6,41 @@
 <h1>Destinations ({{destination_list | length}})</h1>
 <p>
   <a class="btn btn-primary" href="{% url 'destination-add-combo' %}">Add New Destination</a>
-  <a class="btn btn-primary" href="{% url 'destination-search' %}">Search/Filter</a>
+  <a class="btn btn-primary" href="{% url 'destination-search' %}">Trip Finder</a>
+</p>
+<p>
+  <form action="" method="GET">
+    <label for="id_dest_name">Name Filter:</label>
+    <input type="text" name="dest_name" maxlength="40" id="id_dest_name">
+    <input type="submit" value="Filter">
+  </form>
+  <form action="" method="GET">
+    <input type="submit" value="Clear Filter">
+  </form>
 </p>
 
-<ul>
-  {% for dest in destination_list %}
-  <li><a href="{{dest.get_absolute_url}}">{{dest.name}}</a></li>
-  {% endfor %}
-</ul>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Name</th>
+      <th scope="col">Type</th>
+      <th scope="col">Elevation</th>
+      <th scope="col"># of Routes</th>
+      <th scope="col">County</th>
+      <th scope="col">Jurisdiction</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for dest in destination_list %}
+    <tr>
+      <td><a href="{{dest.get_absolute_url}}">{{dest.name}}</a></td>
+      <td>{{dest.dest_type_expanded}}</td>
+      <td>{{dest.elevation|floatformat:"0"}} ft</td>
+      <td>{{dest.route_set.count}}</td>
+      <td>{{dest.county.name}} ({{dest.county.state}})</td>
+      <td>{{dest.jurisdiction}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 {% endblock %}
