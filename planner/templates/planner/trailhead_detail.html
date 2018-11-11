@@ -12,15 +12,13 @@
 
 
 {% block sidebar_content %}
-  <div>
-    <p><a href="{% url 'trailhead-edit' pk=trailhead.pk %}" class="btn btn-primary">Edit Page</a></p>
+  <div class="row">
+    <h3>Admin Controls</h3>
+    <p>
+      <a href="{% url 'trailhead-edit' pk=trailhead.pk %}" class="btn btn-primary">Edit Page</a>
+      <a href="{% url 'trailhead-delete' pk=trailhead.pk %}" class="btn btn-danger">Delete Page</a>
+    </p>
   </div>
-  <h3>Relevant Links</h3>
-  <ul>
-    <li><a href="#">Link 1</a></li>
-    <li><a href="#">Link 2</a></li>
-    <li><a href="#">User Links here</a></li>
-  </ul>
 {% endblock %}
 
 
@@ -43,11 +41,11 @@
     -->
     <tr>
       <th scope="row">Location</th>
-      <td>{{trailhead.county.state}}<br>{{trailhead.county.name}} County</td>
+      <td>{{trailhead.county.name}} County ({{trailhead.county.state}})</td>
     </tr>
     <tr>
       <th scope="row">Jurisdiction</th>
-      <td>{{trailhead.jurisdiction}}<br>{{trailhead.jurisdiction.governing_body}}</td>
+      <td><a href="trailhead.jurisdiction.website">{{trailhead.jurisdiction}}</a><br>{{trailhead.jurisdiction.governing_body}}</td>
     </tr>
     <tr>
       <th scope="row">Drive Distance</th>
@@ -67,14 +65,12 @@
   {% endif %}
 
   <div><a id="TH-directions-button" href="{{directions_external_url}}" class="btn btn-primary btn-block" target="_blank">Open Driving Directions</a></div>
-  <p><a href="{{directions_api_url}}">Directions API call</a></p>
+  {# <p><a href="{{directions_api_url}}">Directions API call</a></p> #}
 
 {% endblock %}
 
 {% block detail_map_embed %}
-  <iframe width="100%" height="90%" frameborder="0" style="border:0" src="{{trailhead.google_maps_embed_url}}" allowfullscreen></iframe>
-  <p><a href="{{trailhead.google_maps_embed_url}}">TH embedded map</a></p>
-  {# <p><a href="{{trailhead.google_maps_embed_url}}">TH static map</a></p> #}
+  <iframe width="100%" height="100%" frameborder="0" style="border:0" src="{{trailhead.google_maps_embed_url}}" allowfullscreen></iframe>
 {% endblock %}
 
 {% block detail_buttons %}
@@ -101,21 +97,15 @@
         {% if routes %}
           <ul>
           {% for route in routes %}
-
-            {% with destinations=route.destination.all %}
-
-            <li><a href="{{route.get_absolute_url}}">{{route.name}} - {{route.destination.name}}</a> {% if destinations %}
-              {% for dest in destinations %}
-                {% if forloop.first %}({% endif %}<a href="{{dest.get_absolute_url}}">{{dest.name}}</a>{% if not forloop.last %},{% else %}){% endif %}
-              {% endfor %}
-            {% endif %}</li>
-
+            {% with dest=route.destination %}
+            <li>
+              <a href="{{route.get_absolute_url}}">{{dest.name}} - {{route.name}}</a>
+            </li>
             {% endwith %}
-
           {% endfor %}
           </ul>
         {% else %}
-          <p>There are no saved routes accessing this destination.</p>
+          <p>There are no saved routes linked to this trailhead.</p>
         {% endif %}
 
       {% endwith %}
@@ -124,7 +114,7 @@
 
   <div class="row">
     <section class="col th-redtape">
-      <h2>Red Tape ({{trailhead.jurisdiction}})</h2>
+      <h2>Red Tape (<a href="{{trailhead.jurisdiction.website}}">{{trailhead.jurisdiction}}</a>)</h2>
       <table class="table">
         <tr>
           <th scope="row">Parking</th>

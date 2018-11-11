@@ -121,7 +121,9 @@ class DestinationSearchView(LoginRequiredMixin, generic.ListView):
             if value != "":
                 # apply applicable filters based on parameter
                 # print("filter param: {0}, value: {1}".format(param, value))
-                if param == "min_length":
+                if param == "dest_name":
+                    out_dict["destination__name__icontains"] = value
+                elif param == "min_length":
                     out_dict["total_distance__gte"] = float(value)
                 elif param == "max_length":
                     out_dict["total_distance__lte"] = float(value)
@@ -322,6 +324,20 @@ class RouteDetailView(LoginRequiredMixin, generic.DetailView):
         weather_raw_data = accessAPI.NOAA_API(noaa_api_url)
         weather_data_by_day = parseAPI.NOAA_by_day(weather_raw_data)
         context['weather_by_day'] = weather_data_by_day
+
+        # get generic drive time data
+        if (self.request.user.is_authenticated
+            and self.request.user.profile.nearest_city is not None):
+
+            mc = self.request.user.profile.nearest_city
+            drive_obj = DriveTimeMajorCity.objects.get(
+                            trailhead=self.object.trailhead,
+                            majorcity=mc)
+            context['general_drive_flag'] = True
+            context['general_drive_time'] = drive_obj.drive_time_str
+            context['general_drive_dist'] = drive_obj.drive_distance_miles
+        else:
+            context['general_drive_flag'] = False
 
         # get links
         context['public_links'] = RouteLink.objects.filter(owner_model=self.object, link_type=Link.PUBLIC)

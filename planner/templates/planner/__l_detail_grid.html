@@ -21,6 +21,12 @@
 
    {# Sidebar - left of screen #}
     <section class="col-2">
+      <section class="detail-buttons">
+        {% block detail_buttons %}
+          <p>block detail_buttons</p>
+        {% endblock %}
+      </section>
+
       {% block sidebar_content %}{% endblock %}
     </section>
 
@@ -31,29 +37,23 @@
       <div class="row">
 
         {# Summary, left half of top row #}
-        <section class="col detail-summary">
+        <section class="col-6 detail-summary">
           {% block detail_title %}
           <h1>block detail_title</h1>
           {% endblock %}
 
           {# Summary block - stats to the left, buttons to the right #}
           <div class="row">
-            <section class="col-8 detail-stats">
+            <section class="col detail-stats">
               {% block detail_stats %}
               <p>block detail_stats</p>
-              {% endblock %}
-            </section>
-
-            <section class="col-4 detail-buttons">
-              {% block detail_buttons %}
-              <p>block detail_buttons</p>
               {% endblock %}
             </section>
           </div>
         </section> {# end summary col #}
 
         {# Map block - right half of top row #}
-        <section class="col detail-map-embed">
+        <section class="col-6 detail-map-embed">
           {% block detail_map_embed %}
             <div>block detail_map_embed</div>
           {% endblock %}

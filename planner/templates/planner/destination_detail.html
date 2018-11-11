@@ -12,15 +12,20 @@
 
 
 {% block sidebar_content %}
-  <div>
+  <div class="row">
+    <h3>Admin Controls</h3>
     <p>
       <a href="{% url 'destination-edit' pk=destination.pk %}" class="btn btn-primary">Edit Page</a>
       <a href="{% url 'destination-delete' pk=destination.pk %}" class="btn btn-danger">Delete Page</a>
     </p>
-    <p><a href="{% url 'route-add-combo' %}?destinationpk={{destination.pk}}" class="btn btn-primary">Add Route</a></p>
-    <p><a href="{% url 'destination-link-add' dest_pk=destination.pk %}" class="btn btn-primary">Add Link</a></p>
   </div>
+
+<p><a href="{% url 'route-add-combo' %}?destinationpk={{destination.pk}}" class="btn btn-primary">Add Route</a></p>
+
   <h3>Relevant Links</h3>
+
+  <p><a href="{% url 'destination-link-add' dest_pk=destination.pk %}" class="btn btn-primary">Add Link</a></p>
+
   <ul>
     {% for pub_link in public_links %}
       <li><a href="{{pub_link.url}}" target="_blank">{{pub_link.label}}</a>
@@ -43,11 +48,6 @@
       <li>No links saved.</li>
     {% endfor %}
   </ul>
-  <h3>User Tags</h3>
-  <ul>
-    <li>Tag 1</li>
-    <li>Tag 2</li>
-  </ul>
 {% endblock %}
 
 
@@ -69,18 +69,17 @@
     </tr>
     <tr>
       <th scope="row">Location</th>
-      <td>{{destination.county.state}}<br>{{destination.county.name}} County</td>
+      <td>{{destination.county.name}} County ({{destination.county.state}})</td>
     </tr>
     <tr>
       <th scope="row">Jurisdiction</th>
-      <td>{{destination.jurisdiction}}<br>{{destination.jurisdiction.governing_body}}</td>
+      <td><a href="{{destination.jurisdiction.website}}" target="_blank">{{destination.jurisdiction}}</a><br>{{destination.jurisdiction.governing_body}}</td>
     </tr>
   </table>
 {% endblock %}
 
 {% block detail_map_embed %}
   <img src="{{destination.google_maps_embed_url}}">
-  {# <img src="{% static 'planner/img/staticmap.png' %}"> #}
   {# <p><a href="{{destination.google_maps_embed_url}}">Destination static map</a></p> #}
 {% endblock %}
 
@@ -129,7 +128,7 @@
 
   <div class="row">
     <section class="col dest-redtape">
-      <h2>Red Tape ({{destination.jurisdiction}})</h2>
+      <h2>Red Tape (<a href="{{destination.jurisdiction.website}}" target="_blank">{{destination.jurisdiction}}</a>)</h2>
       <table class="table">
         <tr>
           <th scope="row">Parking</th>

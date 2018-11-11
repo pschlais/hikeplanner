@@ -2,14 +2,17 @@
 
 
 {% block sidebar_content %}
-  <div>
+  <div class="row">
+    <h3>Admin Controls</h3>
     <p>
       <a href="{% url 'route-edit' pk=route.pk %}" class="btn btn-primary">Edit Page</a>
       <a href="{% url 'route-delete' pk=route.pk %}" class="btn btn-danger">Delete Page</a>
     </p>
-    <p><a href="{% url 'route-link-add' route_pk=route.pk %}" class="btn btn-primary">Add Link</a></p>
   </div>
+
   <h3>Relevant Links</h3>
+  <p><a href="{% url 'route-link-add' route_pk=route.pk %}" class="btn btn-primary">Add Link</a></p>
+
   <ul>
     {% for pub_link in public_links %}
       <li><a href="{{pub_link.url}}" target="_blank">{{pub_link.label}}</a>
@@ -42,61 +45,66 @@
 
 {% block detail_stats %}
   <table class="table">
-    <tr>
-      <th scope="row">Total Distance</th>
-      <td>{{route.total_distance | floatformat:1}} mi</td>
-    </tr>
-    <tr>
-      <th scope="row">Total Elevation Gain</th>
-      <td>{{route.gain | floatformat:"0"}} ft</td>
-    </tr>
-    <tr>
-      <th scope="row">Class Rating</th>
-      <td>{{route.class_rating}}</td>
-    </tr>
-    <tr>
-      <th scope="row">Route Sequence</th>
-      <td>{{route.path_seq_expanded}}</td>
-    </tr>
+    {% with dest=route.destination %}
+      <tr>
+        <th scope="row">Destination</th>
+        <td><a href="{{dest.get_absolute_url}}">{{dest.name}} ({{dest.elevation | floatformat:"0"}} ft, {{dest.dest_type_expanded}})</a></td>
+      <tr>
+        <th scope="row">Total Distance</th>
+        <td>{{route.total_distance | floatformat:1}} mi</td>
+      </tr>
+      <tr>
+        <th scope="row">Total Elevation Gain</th>
+        <td>{{route.gain | floatformat:"0"}} ft</td>
+      </tr>
+      <tr>
+        <th scope="row">Class Rating</th>
+        <td>{{route.class_rating}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Route Sequence</th>
+        <td>{{route.path_seq_expanded}}</td>
+      </tr>
 
-    <tr>
-      <th scope="row">Trailhead</th>
-      <td><a href="{{route.trailhead.get_absolute_url}}">{{route.trailhead.name}}</a></td>
-    </tr>
+      <tr>
+        <th scope="row">Trailhead</th>
+        <td><a href="{{route.trailhead.get_absolute_url}}">{{route.trailhead.name}}</a><br>
+        {% if general_drive_flag %}
+          ({{general_drive_dist|floatformat:"0"}} mi, {{general_drive_time}} from {{user.profile.nearest_city}})
+        {% endif %}
+        </td>
+      </tr>
 
-    <tr>
-      <th scope="row">Location</th>
-      <td>{{route.destination.county.state}}<br>{{route.destination.county.name}} County</td>
-    </tr>
+      <tr>
+        <th scope="row">Location</th>
+        <td>{{route.destination.county.name}} County ({{route.destination.county.state}})</td>
+      </tr>
 
-    <tr>
-      <th scope="row">Jurisdiction</th>
-      <td>{{route.destination.jurisdiction}}<br>{{route.destination.jurisdiction.governing_body}}</td>
-    </tr>
+      <tr>
+        <th scope="row">Jurisdiction</th>
+        <td><a href="{{route.destination.jurisdiction.website}}" target="_blank">{{route.destination.jurisdiction}}</a><br>{{route.destination.jurisdiction.governing_body}}</td>
+      </tr>
+    {% endwith %}
   </table>
 {% endblock %}
 
 
+{% block detail_map_embed %}
+  <img src="{{route.destination.google_maps_embed_url}}">
+{% endblock %}
+
+
 {% block detail_buttons %}
-  <a href="#" class="btn btn-secondary btn-block">Google Terrain</a>
-  <a href="#" class="btn btn-secondary btn-block">Google Satellite</a>
-  <a href="#" class="btn btn-secondary btn-block">CalTopo</a>
-  <a href="#" class="btn btn-secondary btn-block">NOAA Weather</a>
+  {% with dest=route.destination %}
+    <a href="{{dest.google_maps_terrain_url}}" class="btn btn-secondary btn-block" target="_blank">Google Terrain</a>
+    <a href="{{dest.google_maps_satellite_url}}" class="btn btn-secondary btn-block" target="_blank">Google Satellite</a>
+    <a href="{{dest.caltopo_url}}" class="btn btn-secondary btn-block" target="_blank">CalTopo</a>
+    <a href="{{dest.noaa_url}}" class="btn btn-secondary btn-block" target="_blank">NOAA Weather</a>
+  {% endwith %}
 {% endblock %}
 
 
 {% block detail_below_fold %}
-
-  <div class="row">
-    <section class="col route-destinations">
-        <h2>Route Destination</h2>
-        {% with route.destination as dest %}
-          <ul>
-            <li><a href="{{dest.get_absolute_url}}">{{dest.name}} ({{dest.dest_type_expanded}}), {{dest.elevation | floatformat:"0"}} ft</a></li>
-          </ul>
-        {% endwith %}
-    </section>
-  </div>
 
   <div class="row">
     {% if route.description %}
@@ -116,17 +124,19 @@
 
   <div class="row">
     <section class="col route-redtape">
-      <h2>Red Tape ({{route.destination.jurisdiction}})</h2>
-      <table class="table">
-        <tr>
-          <th scope="row">Parking</th>
-            <td>{{route.destination.jurisdiction.parking_info|default:"No information in database"}}</td>
-        </tr>
-        <tr>
-          <th scope="row">Camping</th>
-            <td>{{route.destination.jurisdiction.camping_info|default:"No information in database"}}</td>
-        </tr>
-      </table>
+      {% with juris=route.destination.jurisdiction %}
+        <h2>Red Tape (<a href="{{juris.website}}" target="_blank">{{juris}}</a>)</h2>
+        <table class="table">
+          <tr>
+            <th scope="row">Parking</th>
+              <td>{{juris.parking_info|default:"No information in database"}}</td>
+          </tr>
+          <tr>
+            <th scope="row">Camping</th>
+              <td>{{juris.camping_info|default:"No information in database"}}</td>
+          </tr>
+        </table>
+      {% endwith %}
     </section>
   </div>
 {% endblock %}

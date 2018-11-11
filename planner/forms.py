@@ -19,6 +19,7 @@ class DestinationForm(forms.ModelForm):
 
 
 class DestinationSearchForm(forms.Form):
+    dest_name = forms.CharField(max_length=40, required=False, label="Destination Name")
     min_length = forms.DecimalField(min_value=0, decimal_places=1, required=False, label="Min Length [mi]")
     max_length = forms.DecimalField(min_value=0, decimal_places=1, required=False, label="Max Length [mi]")
     min_gain = forms.IntegerField(min_value=0, required=False, label="Min Elevation Gain [ft]")
