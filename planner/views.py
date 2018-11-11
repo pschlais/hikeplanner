@@ -318,6 +318,13 @@ class DestinationAutocomplete(BaseSelectAutocomplete):
 class RouteListView(LoginRequiredMixin, generic.ListView):
     model = Route
 
+    def get_queryset(self):
+        route_name = self.request.GET.get("route_name", "")
+        if route_name:
+            return Route.objects.filter(name__icontains=route_name)
+        else:
+            return Route.objects.all()
+
 
 class RouteDetailView(LoginRequiredMixin, generic.DetailView):
     model = Route
@@ -338,12 +345,17 @@ class RouteDetailView(LoginRequiredMixin, generic.DetailView):
             and self.request.user.profile.nearest_city is not None):
 
             mc = self.request.user.profile.nearest_city
-            drive_obj = DriveTimeMajorCity.objects.get(
+            try:
+                drive_obj = DriveTimeMajorCity.objects.get(
                             trailhead=self.object.trailhead,
-                            majorcity=mc)
-            context['general_drive_flag'] = True
-            context['general_drive_time'] = drive_obj.drive_time_str
-            context['general_drive_dist'] = drive_obj.drive_distance_miles
+                            majorcity=mc,
+                            api_call_status=DriveTimeMajorCity.OK)
+            except DriveTimeMajorCity.DoesNotExist:
+                context['general_drive_flag'] = False
+            else:
+                context['general_drive_flag'] = True
+                context['general_drive_time'] = drive_obj.drive_time_str
+                context['general_drive_dist'] = drive_obj.drive_distance_miles
         else:
             context['general_drive_flag'] = False
 

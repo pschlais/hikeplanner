@@ -5,8 +5,8 @@
 
 <h1>Destinations ({{destination_list | length}})</h1>
 <p>
-  <a class="btn btn-primary" href="{% url 'destination-add-combo' %}">Add New Destination</a>
-  <a class="btn btn-primary" href="{% url 'destination-search' %}">Trip Finder</a>
+  <a href="{% url 'destination-add-combo' %}" class="btn btn-primary">Add New Destination</a>
+  <a href="{% url 'destination-search' %}" class="btn btn-primary">Trip Finder</a>
 </p>
 <p>
   <form action="" method="GET">
