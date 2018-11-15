@@ -1,7 +1,7 @@
 """
 Django app development-specific settings
 """
-
+import os
 from .base import *
 
 DEBUG = True

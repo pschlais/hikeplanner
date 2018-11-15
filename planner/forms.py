@@ -1,11 +1,18 @@
 from django import forms
 from django.forms import widgets
+from django.contrib.auth.models import User
 from dal import autocomplete
 from .models import Profile, Destination, Route, GoverningBody, Jurisdiction, Trailhead
 from .models import Link
 
 
 # Form classes
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["first_name", "last_name", "email"]
+
+
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
@@ -179,5 +186,4 @@ class LinkBaseForm(forms.ModelForm):
             # make link type disabled and hidden
             self.fields['link_type'].disabled = True
             self.fields['link_type'].widget = widgets.MultipleHiddenInput()
-
 

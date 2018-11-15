@@ -10,7 +10,7 @@ from .models import Destination, Route, Trailhead, Profile, GoverningBody
 from .models import Link, DestinationLink, RouteLink
 from django.db.models import F
 from .models import Jurisdiction, DriveTimeMajorCity
-from .forms import ProfileForm, TrailheadForm, DestinationSearchForm
+from .forms import UserForm, ProfileForm, TrailheadForm, DestinationSearchForm
 from .forms import DestinationForm
 from .forms import RouteForm, RouteInDestComboForm, RouteMainComboForm
 from .forms import TrailheadComboForm
@@ -545,10 +545,6 @@ class JurisdictionDelete(LoginRequiredMixin, DeleteView):
 
 
 # ------- User Profile views ----------------------
-class UserProfileDetailView(LoginRequiredMixin, generic.DetailView):
-    model = User
-
-
 @login_required
 def profile_overview(request):
     return render(request, 'planner/profile_overview.html')
@@ -557,21 +553,28 @@ def profile_overview(request):
 @login_required
 def profile_update(request):
     # get profile data from database
-    profile = Profile.objects.get(pk=request.user)
+    user = request.user
+    profile = request.user.profile
     # process form data if POST request
     if request.method == "POST":
         # create form instance and populate it with request:
-        form = ProfileForm(request.POST, instance=profile)
-        if form.is_valid():
+        user_form = UserForm(request.POST, instance=user, prefix="user")
+        profile_form = ProfileForm(request.POST, instance=profile,
+                                   prefix="profile")
+        if user_form.is_valid() and profile_form.is_valid():
             # save data
-            form.save()
+            user_form.save()
+            profile_form.save()
             return redirect(reverse('profile-detail'))
 
     # create default form for GET or other method
     else:
-        form = ProfileForm(instance=profile)
+        user_form = UserForm(instance=user, prefix="user")
+        profile_form = ProfileForm(instance=profile, prefix="profile")
 
-    return render(request, "planner/profile_update.html", {'form': form})
+    context = {'user_form': user_form, 'profile_form': profile_form}
+
+    return render(request, "planner/profile_update.html", context)
 
 
 # ---------- Public Link views ----------------------
