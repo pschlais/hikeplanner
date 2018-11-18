@@ -2,11 +2,13 @@
 {# takes an input "form", which is a form context object from Form class #}
 {# posts result back to the same page including the form #}
 
-<section class="row">
-  <section class="col">
+{% load crispy_forms_tags %}
+
+<section class="row justify-content-center">
+  <section class="col-4">
     <form action="" method="post">
       {% csrf_token %}
-      <table>{{form.as_table}}</table>
+      {{form|crispy}}
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>
   </section>

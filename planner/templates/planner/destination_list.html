@@ -1,7 +1,6 @@
 {% extends "planner/__base.html" %}
 
 {% block main_content %}
-{% include "planner/_nav_header.html" %}
 
 <h1>Destinations ({{destination_list | length}})</h1>
 <p>
@@ -9,23 +8,22 @@
   <a href="{% url 'destination-search' %}" class="btn btn-primary">Trip Finder</a>
 </p>
 <p>
-  <form action="" method="GET">
+  <form action="" method="GET" class="form-inline">
     <label for="id_dest_name">Name Filter:</label>
-    <input type="text" name="dest_name" maxlength="40" id="id_dest_name">
-    <input type="submit" value="Filter">
+    <input type="text" class="form-control ml-2" name="dest_name" maxlength="40" id="id_dest_name">
+    <button type="submit" class="btn btn-primary mx-2">Filter</button>
+    <a href="{% url 'destination-list' %}" class="btn btn-secondary">Clear Filter</a>
   </form>
-  <form action="" method="GET">
-    <input type="submit" value="Clear Filter">
-  </form>
+
 </p>
 
-<table class="table table-striped">
+<table class="table table-striped table-sm">
   <thead>
     <tr>
       <th scope="col">Name</th>
       <th scope="col">Type</th>
-      <th scope="col">Elevation</th>
-      <th scope="col"># of Routes</th>
+      <th scope="col" class="text-center">Elevation</th>
+      <th scope="col" class="text-center"># of Routes</th>
       <th scope="col">County</th>
       <th scope="col">Jurisdiction</th>
     </tr>
@@ -35,8 +33,8 @@
     <tr>
       <td><a href="{{dest.get_absolute_url}}">{{dest.name}}</a></td>
       <td>{{dest.dest_type_expanded}}</td>
-      <td>{{dest.elevation|floatformat:"0"}} ft</td>
-      <td>{{dest.route_set.count}}</td>
+      <td class="text-center">{{dest.elevation|floatformat:"0"}} ft</td>
+      <td class="text-center">{{dest.route_set.count}}</td>
       <td>{{dest.county.name}} ({{dest.county.state}})</td>
       <td>{{dest.jurisdiction}}</td>
     </tr>

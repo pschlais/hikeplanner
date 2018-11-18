@@ -2,29 +2,36 @@
 
 {% load static %}
 
-
-
 {% block stylesheets %}
   {{block.super}}
   <link rel="stylesheet" href="{% static 'planner/css/destination_detail.css' %}">
 {% endblock %}
 
 
+{% block admin_controls %}
+  <div class="mt-1 mb-4">
+    <h3>Admin Controls</h3>
+    <a href="{% url 'destination-edit' pk=destination.pk %}" class="btn btn-primary btn-block">Edit Page</a>
+    <a href="{% url 'destination-delete' pk=destination.pk %}" class="btn btn-danger btn-block">Delete Page</a>
+  </div>
+{% endblock %}
+
+
+{% block detail_buttons %}
+  <div class="mb-3">
+    <a href="{{destination.google_maps_terrain_url}}" class="btn btn-secondary btn-block" target="_blank">Google Terrain</a>
+    <a href="{{destination.google_maps_satellite_url}}" class="btn btn-secondary btn-block" target="_blank">Google Satellite</a>
+    <a href="{{destination.caltopo_url}}" class="btn btn-secondary btn-block" target="_blank">CalTopo</a>
+    <a href="{{destination.noaa_url}}" class="btn btn-secondary btn-block" target="_blank">NOAA Weather</a>
+  </div>
+{% endblock %}
+
 
 {% block sidebar_content %}
-  <div class="row">
-    <h3>Admin Controls</h3>
-    <p>
-      <a href="{% url 'destination-edit' pk=destination.pk %}" class="btn btn-primary">Edit Page</a>
-      <a href="{% url 'destination-delete' pk=destination.pk %}" class="btn btn-danger">Delete Page</a>
-    </p>
-  </div>
-
-<p><a href="{% url 'route-add-combo' %}?destinationpk={{destination.pk}}" class="btn btn-primary">Add Route</a></p>
 
   <h3>Relevant Links</h3>
 
-  <p><a href="{% url 'destination-link-add' dest_pk=destination.pk %}" class="btn btn-primary">Add Link</a></p>
+  <a href="{% url 'destination-link-add' dest_pk=destination.pk %}" class="btn btn-primary btn-block">Add Link</a>
 
   <ul>
     {% for pub_link in public_links %}
@@ -38,7 +45,7 @@
   </ul>
 
   <ul>
-    {% if public_links %}<h4>Your Links</h4>{% endif %}
+    <h4>Your Links</h4>
     {% for pr_link in private_links %}
       <li><a href="{{pr_link.url}}" target="_blank">{{pr_link.label}}</a>
         (<a href="{{pr_link.get_edit_url}}">Edit</a>)
@@ -53,7 +60,7 @@
 
 {% block detail_title %}
   <h1>{{destination.name}}</h1>
-  <h2>{{destination.dest_type_expanded}}</h2>
+  <h2><em class="text-muted">{{destination.dest_type_expanded}}</em></h2>
 {% endblock %}
 
 
@@ -84,23 +91,15 @@
 {% endblock %}
 
 
-{% block detail_buttons %}
-  <a href="{{destination.google_maps_terrain_url}}" class="btn btn-secondary btn-block" target="_blank">Google Terrain</a>
-  <a href="{{destination.google_maps_satellite_url}}" class="btn btn-secondary btn-block" target="_blank">Google Satellite</a>
-  <a href="{{destination.caltopo_url}}" class="btn btn-secondary btn-block" target="_blank">CalTopo</a>
-  <a href="{{destination.noaa_url}}" class="btn btn-secondary btn-block" target="_blank">NOAA Weather</a>
-{% endblock %}
-
-
 {% block detail_below_fold %}
   {% if destination.description %}
   <section class="dest-description">
     <h2>Description</h2>
-    <p>{{destination.description}}</p>
+    <p>{{destination.description|default:"No description provided."}}</p>
   </section>
   {% endif %}
 
-  <div class="row">
+  <div class="row mb-3">
     <section class="col dest-routes">
       {% with routes=destination.route_set.all %}
         <h2>Routes ({{routes | length}})</h2>
@@ -115,6 +114,7 @@
           <p>There are no saved routes accessing this destination.</p>
         {% endif %}
 
+        <a href="{% url 'route-add-combo' %}?destinationpk={{destination.pk}}" class="btn btn-primary">Add Route</a>
       {% endwith %}
     </section>
   </div>

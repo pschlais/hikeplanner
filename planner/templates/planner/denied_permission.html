@@ -1,5 +1,11 @@
 {% extends "planner/__base.html" %}
 
+{% block navbar %}
+  {% if user.is_authenticated %}
+    {{block.super}}
+  {% endif %}
+{% endblock %}
+
 {% block main_content %}
   <p>You do not have permission to access this page. Please login to an account with elevated privileges.</p>
   <p><a class="btn btn-primary" href="{% url 'login' %}?next={{request.path}}">Go to login page</a></p>

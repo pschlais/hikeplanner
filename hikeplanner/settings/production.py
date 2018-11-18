@@ -24,6 +24,9 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+DEFAULT_FROM_EMAIL = 'webmaster@adventurersportal.herokuapp.com'
 EMAIL_HOST = 'smtp.sendgrid.net'
 EMAIL_HOST_USER = os.environ.get("SENDGRID_SMTP_USERNAME")
 EMAIL_HOST_PASSWORD = os.environ.get("SENDGRID_SMTP_API_KEY")

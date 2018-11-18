@@ -11,7 +11,7 @@
 
   {% block stylesheets %}
     <!-- CSS reset -->
-    <link rel="stylesheet" href="{% static 'planner/css/reset.css' %}">
+    {#<link rel="stylesheet" href="{% static 'planner/css/reset.css' %}">#}
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
   {% endblock %}
@@ -23,9 +23,15 @@
 </head>
 <body>
   {% block body_override %}
+
+    {% block navbar %}
+      {% include "planner/_nav_header.html" with user=user %}
+    {% endblock %}
+
     <div class="container-fluid">
       {% block main_content %}{% endblock %}
     </div>
+
   {% endblock %}
 
   {% block javascript_footer %}{% endblock %}

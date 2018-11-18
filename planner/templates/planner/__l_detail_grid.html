@@ -13,17 +13,19 @@
 
 {% block main_content %}
 
-  {# Navigation - header of page #}
-  {% include "planner/_nav_header.html" with user=user %}
-
   {# Page below navigation #}
-  <section class=row>
+  <section class="row">
 
    {# Sidebar - left of screen #}
-    <section class="col-2">
+    <section class="col-sm-auto sidebar">
+
+      <section class="admin-controls">
+        {% block admin_controls %}
+        {% endblock %}
+      </section>
+
       <section class="detail-buttons">
         {% block detail_buttons %}
-          <p>block detail_buttons</p>
         {% endblock %}
       </section>
 
@@ -31,33 +33,32 @@
     </section>
 
   {# Stage - layout of remaining right side of page #}
-    <section class="col-10">
+    <section class="col">
 
       {# main content row #}
       <div class="row">
 
         {# Summary, left half of top row #}
-        <section class="col-6 detail-summary">
+        <section class="col detail-summary">
           {% block detail_title %}
-          <h1>block detail_title</h1>
           {% endblock %}
 
-          {# Summary block - stats to the left, buttons to the right #}
-          <div class="row">
-            <section class="col detail-stats">
-              {% block detail_stats %}
-              <p>block detail_stats</p>
-              {% endblock %}
-            </section>
-          </div>
+          {# Summary block #}
+          <section class="detail-stats">
+            {% block detail_stats %}
+            {% endblock %}
+          </section>
+
         </section> {# end summary col #}
 
         {# Map block - right half of top row #}
-        <section class="col-6 detail-map-embed">
+        {% block detail_map_embed_section_override %}
+        <section class="col-md-auto detail-map-embed">
           {% block detail_map_embed %}
             <div>block detail_map_embed</div>
           {% endblock %}
         </section>
+        {% endblock %}
 
       </div>
 
@@ -71,7 +72,6 @@
 {% endblock main_content %}
 
 {% block stage_content %}
-
 {% endblock stage_content %}
 
 {% block javascript_footer %}

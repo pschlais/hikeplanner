@@ -1,24 +1,45 @@
 {% extends "planner/__base.html" %}
 
+{% load static %}
+{% load crispy_forms_tags %}
+
+
+{% block stylesheets %}
+  {{block.super}}
+  <link rel="stylesheet" href="{% static 'planner/css/select2_override.css' %}">
+{% endblock %}
+
 {% block main_content %}
 
-  {% include "planner/_nav_header.html" %}
-
-  <div class="row">
-    <div class="col">
+  <div class="row justify-content-center mb-5">
+    <div class="col-4">
       <form action="" method="post">
         {% csrf_token %}
+
         <h1>Destination</h1>
-        {{ dest_form.as_p }}
+        {{ dest_form|crispy }}
+
         <h1>Route</h1>
-        {{ route_form.as_p }}
+        {{ route_form|crispy }}
+
         <p>Add a new trailhead?</p>
-        <input type="radio" name="add_trailhead" value="Yes" checked>Yes<br>
-        <input type="radio" name="add_trailhead" value="No">No<br>
-        <p>("Yes" will ignore trailhead input above, "No" will ignore trailhead input below)</p>
+        <small class="form-text text-muted">("Yes" will ignore trailhead input above, "No" will ignore any trailhead input below)</small>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="add_trailhead" id="addTrailhead1" value="Yes" checked>
+          <label class="form-check-label" for="addTrailhead1">
+            Yes
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="add_trailhead" id="addTrailhead2" value="No">
+          <label class="form-check-label" for="addTrailhead2">
+            No
+          </label>
+        </div>
+
         <h1>Trailhead</h1>
-        {{ trailhead_form.as_p }}
-        <input type="submit" value="Create" />
+        {{ trailhead_form|crispy }}
+        <button type="submit" class="btn btn-primary">Submit</button>
       </form>
     </div>
   </div>

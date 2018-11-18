@@ -15,16 +15,13 @@
 
 {% block main_content %}
 
-  {# Navigation - header of page #}
-  {% include "planner/_nav_header.html" with user=user %}
-
   {# Stage - layout of remaining right side of page #}
-  <section class=row>
-    <section class="col-2">
+  <section class="row">
+    <section class="col-xs-auto sidebar">
       {% block sidebar_content %}{% endblock %}
     </section>
 
-    <section class="col-10">
+    <section class="col">
       {% block stage_content %}{% endblock %}
     </section>
   </section>

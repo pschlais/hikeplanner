@@ -1,7 +1,6 @@
 {% extends "planner/__base.html" %}
 
 {% block main_content %}
-  {% include "planner/_nav_header.html" %}
 
   <h1>Routes ({{route_list | length}})</h1>
   <p>
@@ -9,24 +8,22 @@
     <a href="{% url 'destination-search' %}" class="btn btn-primary">Trip Finder</a>
   </p>
   <p>
-    <form action="" method="GET">
+    <form action="" method="GET" class="form-inline">
       <label for="id_route_name">Name Filter:</label>
-      <input type="text" name="route_name" maxlength="40" id="id_route_name">
-      <input type="submit" value="Filter">
-    </form>
-    <form action="" method="GET">
-      <input type="submit" value="Clear Filter">
+      <input type="text" class="form-control ml-2" name="route_name" maxlength="40" id="id_route_name">
+      <button type="submit" class="btn btn-primary mx-2">Filter</button>
+      <a href="{% url 'route-list' %}" class="btn btn-secondary">Clear Filter</a>
     </form>
   </p>
 
-  <table class="table table-striped">
+  <table class="table table-striped table-sm">
     <thead>
       <tr>
         <th scope="col">Name</th>
         <th scope="col">Destination</th>
-        <th scope="col">Distance</th>
-        <th scope="col">Elevation Gain</th>
-        <th scope="col">Class [1-5]</th>
+        <th scope="col" class="text-center">Distance</th>
+        <th scope="col" class="text-center">Elevation Gain</th>
+        <th scope="col" class="text-center">Class [1-5]</th>
         <th scope="col">Sequence</th>
       </tr>
     </thead>
@@ -35,9 +32,9 @@
         <tr>
           <td><a href="{{route.get_absolute_url}}">{{route.name}}</a></td>
           <td><a href="{{route.destination.get_absolute_url}}">{{route.destination.name}}</a></td>
-          <td>{{route.total_distance|floatformat:1}} mi</td>
-          <td>{{route.gain|floatformat:"0"}} ft</td>
-          <td>{{route.class_rating}}</td>
+          <td class="text-center">{{route.total_distance|floatformat:1}} mi</td>
+          <td class="text-center">{{route.gain|floatformat:"0"}} ft</td>
+          <td class="text-center">{{route.class_rating}}</td>
           <td>{{route.path_seq_expanded}}</td>
         </tr>
       {% endfor %}

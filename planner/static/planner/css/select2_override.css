@@ -1,0 +1,4 @@
+.select2-container {
+  /* make width initialize to full container for bootstrap */
+  width: 100%;
+}

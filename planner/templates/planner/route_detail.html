@@ -1,17 +1,29 @@
 {% extends "planner/__l_detail_grid.html" %}
 
 
-{% block sidebar_content %}
-  <div class="row">
+{% block admin_controls %}
+  <div class="mt-1 mb-4">
     <h3>Admin Controls</h3>
-    <p>
-      <a href="{% url 'route-edit' pk=route.pk %}" class="btn btn-primary">Edit Page</a>
-      <a href="{% url 'route-delete' pk=route.pk %}" class="btn btn-danger">Delete Page</a>
-    </p>
+    <a href="{% url 'route-edit' pk=route.pk %}" class="btn btn-primary btn-block">Edit Page</a>
+    <a href="{% url 'route-delete' pk=route.pk %}" class="btn btn-danger btn-block">Delete Page</a>
   </div>
+{% endblock %}
+
+{% block detail_buttons %}
+  {% with dest=route.destination %}
+    <div class="mb-3">
+      <a href="{{dest.google_maps_terrain_url}}" class="btn btn-secondary btn-block" target="_blank">Google Terrain</a>
+      <a href="{{dest.google_maps_satellite_url}}" class="btn btn-secondary btn-block" target="_blank">Google Satellite</a>
+      <a href="{{dest.caltopo_url}}" class="btn btn-secondary btn-block" target="_blank">CalTopo</a>
+      <a href="{{dest.noaa_url}}" class="btn btn-secondary btn-block" target="_blank">NOAA Weather</a>
+    </div>
+  {% endwith %}
+{% endblock %}
+
+{% block sidebar_content %}
 
   <h3>Relevant Links</h3>
-  <p><a href="{% url 'route-link-add' route_pk=route.pk %}" class="btn btn-primary">Add Link</a></p>
+  <a href="{% url 'route-link-add' route_pk=route.pk %}" class="btn btn-primary btn-block">Add Link</a>
 
   <ul>
     {% for pub_link in public_links %}
@@ -25,7 +37,7 @@
   </ul>
 
   <ul>
-    {% if public_links %}<h4>Your Links</h4>{% endif %}
+    <h4>Your Links</h4>
     {% for pr_link in private_links %}
       <li><a href="{{pr_link.url}}" target="_blank">{{pr_link.label}}</a>
         (<a href="{{pr_link.get_edit_url}}">Edit</a>)
@@ -91,16 +103,6 @@
 
 {% block detail_map_embed %}
   <img src="{{route.destination.google_maps_embed_url}}">
-{% endblock %}
-
-
-{% block detail_buttons %}
-  {% with dest=route.destination %}
-    <a href="{{dest.google_maps_terrain_url}}" class="btn btn-secondary btn-block" target="_blank">Google Terrain</a>
-    <a href="{{dest.google_maps_satellite_url}}" class="btn btn-secondary btn-block" target="_blank">Google Satellite</a>
-    <a href="{{dest.caltopo_url}}" class="btn btn-secondary btn-block" target="_blank">CalTopo</a>
-    <a href="{{dest.noaa_url}}" class="btn btn-secondary btn-block" target="_blank">NOAA Weather</a>
-  {% endwith %}
 {% endblock %}
 
 

@@ -10,15 +10,20 @@
 {% endblock %}
 
 
-
-{% block sidebar_content %}
-  <div class="row">
+{% block admin_controls %}
+  <div class="mt-1 mb-4">
     <h3>Admin Controls</h3>
-    <p>
-      <a href="{% url 'trailhead-edit' pk=trailhead.pk %}" class="btn btn-primary">Edit Page</a>
-      <a href="{% url 'trailhead-delete' pk=trailhead.pk %}" class="btn btn-danger">Delete Page</a>
-    </p>
+    <a href="{% url 'trailhead-edit' pk=trailhead.pk %}" class="btn btn-primary btn-block">Edit Page</a>
+    <a href="{% url 'trailhead-delete' pk=trailhead.pk %}" class="btn btn-danger btn-block">Delete Page</a>
   </div>
+{% endblock %}
+
+
+{% block detail_buttons %}
+  <a href="{{trailhead.google_maps_terrain_url}}" class="btn btn-secondary btn-block" target="_blank">Google Terrain</a>
+  <a href="{{trailhead.google_maps_satellite_url}}" class="btn btn-secondary btn-block" target="_blank">Google Satellite</a>
+  <a href="{{trailhead.caltopo_url}}" class="btn btn-secondary btn-block" target="_blank">CalTopo</a>
+  <a href="{{trailhead.noaa_url}}" class="btn btn-secondary btn-block" target="_blank">NOAA Weather</a>
 {% endblock %}
 
 
@@ -64,26 +69,22 @@
   <div class="alert alert-danger">{{directions_api_data_message}}</div>
   {% endif %}
 
-  <div><a id="TH-directions-button" href="{{directions_external_url}}" class="btn btn-primary btn-block" target="_blank">Open Driving Directions</a></div>
+  <a id="TH-directions-button" href="{{directions_external_url}}" class="btn btn-primary btn-block" target="_blank">Open Driving Directions</a>
   {# <p><a href="{{directions_api_url}}">Directions API call</a></p> #}
 
 {% endblock %}
 
-{% block detail_map_embed %}
-  <iframe width="100%" height="100%" frameborder="0" style="border:0" src="{{trailhead.google_maps_embed_url}}" allowfullscreen></iframe>
-{% endblock %}
-
-{% block detail_buttons %}
-  <a href="{{trailhead.google_maps_terrain_url}}" class="btn btn-secondary btn-block" target="_blank">Google Terrain</a>
-  <a href="{{trailhead.google_maps_satellite_url}}" class="btn btn-secondary btn-block" target="_blank">Google Satellite</a>
-  <a href="{{trailhead.caltopo_url}}" class="btn btn-secondary btn-block" target="_blank">CalTopo</a>
-  <a href="{{trailhead.noaa_url}}" class="btn btn-secondary btn-block" target="_blank">NOAA Weather</a>
+{% block detail_map_embed_section_override %}
+  <section class="col-md-6">
+    <iframe width="100%" height="100%" frameborder="0" src="{{trailhead.google_maps_embed_url}}" allowfullscreen></iframe>
+  </section>
 {% endblock %}
 
 
 {% block detail_below_fold %}
-  <div class="row">
+  <div class="row mt-3">
     <section class="col th-weather">
+      <h2>Weather</h2>
       {% include "planner/_weather_tabs.html" with weather_by_day=weather_by_day %}
     </section>
   </div>

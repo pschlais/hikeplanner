@@ -1,21 +1,8 @@
 .row, .col, .col-2, .col-4, .col-6, .col-8, .col-10 {
-  border: 1px black solid;
+   /*border: 1px black solid;*/
 }
 
-.detail-header h1 {
-  /* color: #a5b263; */
+.sidebar {
+  border-right: 3px #a6a6a6 solid;
 }
-
-.detail-map-embed {
-  /*background-color: #fd7e14;*/
-}
-
-/*
-.detail-buttons a {
-  display: block;
-  width: 80%;
-  font-size: 0.8em;
-  margin: 10px auto;
-}
-*/
 
