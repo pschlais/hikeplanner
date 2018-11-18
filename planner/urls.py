@@ -33,6 +33,7 @@ urlpatterns = [
     # # provide another permutation of destination search, no name hook
     # path('destinations/search/', views.DestinationSearchView.as_view()),
 
+
     path('route/', include([
             path('', views.RouteListView.as_view(), name='route-list'),
             path('add/', views.route_create_combo,
@@ -55,8 +56,8 @@ urlpatterns = [
                  views.route_delete_link, name='route-link-delete'),
     ])),
 
-    path('trailhead/', views.TrailheadListView.as_view(),
-         name='trailhead-list'),
+    # path('trailhead/', views.TrailheadListView.as_view(),
+    #      name='trailhead-list'),
     path('trailhead/<int:pk>/', views.TrailheadDetailView.as_view(),
          name='trailhead-detail'),
     path('trailhead/add/', views.TrailheadCreate.as_view(),
@@ -66,27 +67,27 @@ urlpatterns = [
     path('trailhead/<int:pk>/delete/', views.TrailheadDelete.as_view(),
          name='trailhead-delete'),
 
-    path('govbody/<int:pk>/', views.GoverningBodyDetailView.as_view(),
-         name='govbody-detail'),
-    path('govbodies/', views.GoverningBodyListView.as_view(),
-         name='govbody-list'),
-    path('govbody/add/', views.GoverningBodyCreate.as_view(),
-         name='govbody-add'),
-    path('govbody/<int:pk>/edit/', views.GoverningBodyUpdate.as_view(),
-         name='govbody-edit'),
-    path('govbody/<int:pk>/delete/', views.GoverningBodyDelete.as_view(),
-         name='govbody-delete'),
+    # path('govbody/<int:pk>/', views.GoverningBodyDetailView.as_view(),
+    #      name='govbody-detail'),
+    # path('govbodies/', views.GoverningBodyListView.as_view(),
+    #      name='govbody-list'),
+    # path('govbody/add/', views.GoverningBodyCreate.as_view(),
+    #      name='govbody-add'),
+    # path('govbody/<int:pk>/edit/', views.GoverningBodyUpdate.as_view(),
+    #      name='govbody-edit'),
+    # path('govbody/<int:pk>/delete/', views.GoverningBodyDelete.as_view(),
+    #      name='govbody-delete'),
 
-    path('jurisdiction/<int:pk>/', views.JurisdictionDetailView.as_view(),
-         name='jurisdiction-detail'),
-    path('jurisdictions/', views.JurisdictionListView.as_view(),
-         name='jurisdiction-list'),
-    path('jurisdiction/add/', views.JurisdictionCreate.as_view(),
-         name='jurisdiction-add'),
-    path('jurisdiction/<int:pk>/edit/', views.JurisdictionUpdate.as_view(),
-         name='jurisdiction-edit'),
-    path('jurisdiction/<int:pk>/delete/', views.JurisdictionDelete.as_view(),
-         name='jurisdiction-delete'),
+    # path('jurisdiction/<int:pk>/', views.JurisdictionDetailView.as_view(),
+    #      name='jurisdiction-detail'),
+    # path('jurisdictions/', views.JurisdictionListView.as_view(),
+    #      name='jurisdiction-list'),
+    # path('jurisdiction/add/', views.JurisdictionCreate.as_view(),
+    #      name='jurisdiction-add'),
+    # path('jurisdiction/<int:pk>/edit/', views.JurisdictionUpdate.as_view(),
+    #      name='jurisdiction-edit'),
+    # path('jurisdiction/<int:pk>/delete/', views.JurisdictionDelete.as_view(),
+    #      name='jurisdiction-delete'),
 
     path('profile/', views.profile_overview, name='profile-detail'),
     path('profile/edit/', views.profile_update, name='profile-update'),
@@ -100,4 +101,7 @@ urlpatterns = [
             path('trailhead/', views.TrailheadAutocomplete.as_view(),
                  name='trailhead-autocomplete'),
     ])),
+
+    # Permission denied view
+    path('permission_denied', views.perm_denied, name='permission-denied'),
 ]

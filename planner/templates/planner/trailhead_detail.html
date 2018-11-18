@@ -11,19 +11,23 @@
 
 
 {% block admin_controls %}
-  <div class="mt-1 mb-4">
+  {% if perms.trailhead.can_change %}
+  <div class="mt-1 mb-2">
     <h3>Admin Controls</h3>
     <a href="{% url 'trailhead-edit' pk=trailhead.pk %}" class="btn btn-primary btn-block">Edit Page</a>
     <a href="{% url 'trailhead-delete' pk=trailhead.pk %}" class="btn btn-danger btn-block">Delete Page</a>
   </div>
+  {% endif %}
 {% endblock %}
 
 
 {% block detail_buttons %}
-  <a href="{{trailhead.google_maps_terrain_url}}" class="btn btn-secondary btn-block" target="_blank">Google Terrain</a>
-  <a href="{{trailhead.google_maps_satellite_url}}" class="btn btn-secondary btn-block" target="_blank">Google Satellite</a>
-  <a href="{{trailhead.caltopo_url}}" class="btn btn-secondary btn-block" target="_blank">CalTopo</a>
-  <a href="{{trailhead.noaa_url}}" class="btn btn-secondary btn-block" target="_blank">NOAA Weather</a>
+  <div class="my-2">
+    <a href="{{trailhead.google_maps_terrain_url}}" class="btn btn-secondary btn-block" target="_blank">Google Terrain</a>
+    <a href="{{trailhead.google_maps_satellite_url}}" class="btn btn-secondary btn-block" target="_blank">Google Satellite</a>
+    <a href="{{trailhead.caltopo_url}}" class="btn btn-secondary btn-block" target="_blank">CalTopo</a>
+    <a href="{{trailhead.noaa_url}}" class="btn btn-secondary btn-block" target="_blank">NOAA Weather</a>
+  </div>
 {% endblock %}
 
 
@@ -54,13 +58,29 @@
     </tr>
     <tr>
       <th scope="row">Drive Distance</th>
-      <td>{{directions_api_distance}}</td>
+      <td>
+        {% if directions_api_distance == "Not Available" and general_drive_flag %}
+          {{general_drive_dist|floatformat:"0"}} mi from {{user.profile.nearest_city}}
+        {% else %}
+          {{directions_api_distance}}
+        {% endif %}
+      </td>
     </tr>
     <tr>
       <th scope="row">Drive Time</th>
-      <td>{{directions_api_duration}}</td>
+      <td>
+        {% if directions_api_duration == "Not Available" and general_drive_flag %}
+          {{general_drive_time}} from {{user.profile.nearest_city}}
+        {% else %}
+          {{directions_api_duration}}
+        {% endif %}
+      </td>
     </tr>
   </table>
+
+  {% if directions_api_distance == "Not Available" and general_drive_flag %}
+    <div class="alert alert-warning">Drive data from your address to this trailhead could not be calculated. Make sure you have your address saved in your user settings.</div>
+  {% endif %}
 
   {% if directions_api_status != "OK" %}
   <div class="alert alert-danger">{{directions_api_message}}</div>
@@ -136,6 +156,7 @@
       </table>
     </section>
   </div>
+
 {% endblock %}
 
 

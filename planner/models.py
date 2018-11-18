@@ -444,7 +444,7 @@ class Link(models.Model):
     delete_url_name = ''
 
     label = models.CharField(max_length=LABEL_MAX_LENGTH)
-    url = models.URLField()
+    url = models.URLField(help_text="Include the protocol (http:// or https://)")
     link_type = models.CharField(max_length=2, choices=LINK_TYPES)
     user = models.ForeignKey(User, null=True, on_delete=models.CASCADE)
     # CHILD MODEL MUST IMPLEMENT THE FOLLOWING FIELD:

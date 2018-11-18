@@ -15,8 +15,15 @@
         <a href="{% url 'route-list' %}" class="nav-link">Routes</a>
       </li>
       {% if user.is_authenticated %}
-        <li class="nav-item" >
-          <a href="{% url 'profile-detail' %}" class="nav-link">User Settings ({{user.get_username}})</a>
+        <li class="nav-item">
+          <a href="{% url 'profile-detail' %}" class="nav-link">User Settings</a>
+        </li>
+        <li class="nav-item">
+          <a href="{% url 'logout' %}" class="nav-link">Logout</a>
+        </li>
+      {% else %}
+        <li class="nav-item">
+          <a href="{% url 'login' %}" class="nav-link">Login</a>
         </li>
       {% endif %}
     </ul>

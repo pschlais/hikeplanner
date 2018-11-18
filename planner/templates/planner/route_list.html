@@ -4,7 +4,9 @@
 
   <h1>Routes ({{route_list | length}})</h1>
   <p>
-    <a href="{% url 'route-add-combo' %}" class="btn btn-primary">Add New Route</a>
+    {% if perms.route.can_add %}
+      <a href="{% url 'route-add-combo' %}" class="btn btn-primary">Add New Route</a>
+    {% endif %}
     <a href="{% url 'destination-search' %}" class="btn btn-primary">Trip Finder</a>
   </p>
   <p>

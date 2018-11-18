@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.views import generic
 from django.urls import reverse, reverse_lazy
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.models import User
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from dal import autocomplete
@@ -27,6 +27,9 @@ from .PlannerUtils import conversions
 def home_view(request):
     return render(request, 'planner_home.html')
 
+
+def perm_denied(request):
+    return render(request, 'planner/denied_permission.html')
 
 # -------- Parent Autocomplete class ---------------
 class BaseSelectAutocomplete(autocomplete.Select2QuerySetView):
@@ -183,17 +186,21 @@ class DestinationDetailView(LoginRequiredMixin, generic.DetailView):
         return context
 
 
-class DestinationCreate(LoginRequiredMixin, CreateView):
+class DestinationCreate(LoginRequiredMixin, PermissionRequiredMixin,
+                        CreateView):
     model = Destination
     fields = '__all__'
+    permission_required = "destination.can_add"
 
 
 @login_required
+@permission_required("destination.can_add")
 def destination_create_combo(request):
     template = "planner/destination_combo_create.html"
     return _destination_route_trailhead_create_combo(request, True, template)
 
 
+@login_required
 def _destination_route_trailhead_create_combo(request, useDestForm, template):
     """
     # request is passed by the URL route
@@ -299,14 +306,18 @@ def _destination_route_trailhead_create_combo(request, useDestForm, template):
     return render(request, template, context_dict)
 
 
-class DestinationUpdate(LoginRequiredMixin, UpdateView):
+class DestinationUpdate(LoginRequiredMixin, PermissionRequiredMixin,
+                        UpdateView):
     model = Destination
     fields = '__all__'
+    permission_required = "destination.can_change"
 
 
-class DestinationDelete(LoginRequiredMixin, DeleteView):
+class DestinationDelete(LoginRequiredMixin, PermissionRequiredMixin,
+                        DeleteView):
     model = Destination
     success_url = reverse_lazy('destination-list')
+    permission_required = "destination.can_delete"
 
 
 # Autocomplete query view
@@ -366,9 +377,10 @@ class RouteDetailView(LoginRequiredMixin, generic.DetailView):
         return context
 
 
-class RouteCreate(CreateView):
+class RouteCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = Route
     fields = '__all__'
+    permission_required = 'route.can_add'
     # template_name = "planner/route_form.html"
     # form_class = RouteForm
 
@@ -385,19 +397,22 @@ class RouteCreate(CreateView):
         return kwargs
 
 @login_required
+@permission_required("route.can_add")
 def route_create_combo(request):
     template = "planner/route_combo_create.html"
     return _destination_route_trailhead_create_combo(request, False, template)
 
 
-class RouteUpdate(LoginRequiredMixin, UpdateView):
+class RouteUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Route
     form_class = RouteForm
+    permission_required = 'route.can_change'
 
 
-class RouteDelete(LoginRequiredMixin, DeleteView):
+class RouteDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Route
     success_url = reverse_lazy('route-list')
+    permission_required = 'route.can_delete'
 
 
 # Autocomplete query view
@@ -433,6 +448,25 @@ class TrailheadDetailView(LoginRequiredMixin, generic.DetailView):
         context['directions_api_duration'] = distData["duration"]["text"]
         context['directions_api_distance'] = distData["distance"]["text"]
 
+        # get generic drive time data
+        if (self.request.user.is_authenticated
+            and self.request.user.profile.nearest_city is not None):
+
+            mc = self.request.user.profile.nearest_city
+            try:
+                drive_obj = DriveTimeMajorCity.objects.get(
+                            trailhead=self.object,
+                            majorcity=mc,
+                            api_call_status=DriveTimeMajorCity.OK)
+            except DriveTimeMajorCity.DoesNotExist:
+                context['general_drive_flag'] = False
+            else:
+                context['general_drive_flag'] = True
+                context['general_drive_time'] = drive_obj.drive_time_str
+                context['general_drive_dist'] = drive_obj.drive_distance_miles
+        else:
+            context['general_drive_flag'] = False
+
         # call NOAA forecast API
         noaa_api_url = self.object.noaa_api_url
         context['noaa_api_url'] = noaa_api_url
@@ -450,9 +484,10 @@ class TrailheadListView(LoginRequiredMixin, generic.ListView):
     model = Trailhead
 
 
-class TrailheadCreate(LoginRequiredMixin, CreateView):
+class TrailheadCreate(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = Trailhead
     form_class = TrailheadForm
+    permission_required = 'trailhead.can_add'
 
     def form_valid(self, form):
         # save TH to database
@@ -466,9 +501,10 @@ class TrailheadCreate(LoginRequiredMixin, CreateView):
                                             args=[str(th.pk)]))
 
 
-class TrailheadUpdate(LoginRequiredMixin, UpdateView):
+class TrailheadUpdate(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model = Trailhead
     form_class = TrailheadForm
+    permission_required = 'trailhead.can_change'
 
     def form_valid(self, form):
         # get old object lat/lon to check for changes
@@ -486,9 +522,10 @@ class TrailheadUpdate(LoginRequiredMixin, UpdateView):
         return redirect(self.get_object().get_absolute_url())
 
 
-class TrailheadDelete(LoginRequiredMixin, DeleteView):
+class TrailheadDelete(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = Trailhead
     success_url = reverse_lazy('trailhead-list')
+    permission_required = 'trailhead.can_delete'
 
 
 # Autocomplete query view
@@ -497,7 +534,8 @@ class TrailheadAutocomplete(BaseSelectAutocomplete):
 
 
 # -------- Governing Body views --------------------
-class GoverningBodyDetailView(LoginRequiredMixin, generic.DetailView):
+class GoverningBodyDetailView(LoginRequiredMixin,
+                              generic.DetailView):
     model = GoverningBody
 
 
@@ -505,19 +543,25 @@ class GoverningBodyListView(LoginRequiredMixin, generic.ListView):
     model = GoverningBody
 
 
-class GoverningBodyCreate(LoginRequiredMixin, CreateView):
+class GoverningBodyCreate(LoginRequiredMixin, PermissionRequiredMixin,
+                          CreateView):
     model = GoverningBody
     fields = '__all__'
+    permission_required = 'governingbody.can_add'
 
 
-class GoverningBodyUpdate(LoginRequiredMixin, UpdateView):
+class GoverningBodyUpdate(LoginRequiredMixin, PermissionRequiredMixin,
+                          UpdateView):
     model = GoverningBody
     fields = '__all__'
+    permission_required = 'governingbody.can_change'
 
 
-class GoverningBodyDelete(LoginRequiredMixin, DeleteView):
+class GoverningBodyDelete(LoginRequiredMixin, PermissionRequiredMixin,
+                          DeleteView):
     model = GoverningBody
     success_url = reverse_lazy('govbody-list')
+    permission_required = 'governingbody.can_delete'
 
 
 # --------Jurisdiction views ---------------------
@@ -529,19 +573,25 @@ class JurisdictionListView(LoginRequiredMixin, generic.ListView):
     model = Jurisdiction
 
 
-class JurisdictionCreate(LoginRequiredMixin, CreateView):
+class JurisdictionCreate(LoginRequiredMixin, PermissionRequiredMixin,
+                         CreateView):
     model = Jurisdiction
     fields = '__all__'
+    permission_required = 'jurisdiction.can_add'
 
 
-class JurisdictionUpdate(LoginRequiredMixin, UpdateView):
+class JurisdictionUpdate(LoginRequiredMixin, PermissionRequiredMixin,
+                         UpdateView):
     model = Jurisdiction
     fields = '__all__'
+    permission_required = 'jurisdiction.can_change'
 
 
-class JurisdictionDelete(LoginRequiredMixin, DeleteView):
+class JurisdictionDelete(LoginRequiredMixin, PermissionRequiredMixin,
+                         DeleteView):
     model = Jurisdiction
     success_url = reverse_lazy('jurisdiction-list')
+    permission_required = 'jurisdiction.can_delete'
 
 
 # ------- User Profile views ----------------------

@@ -9,16 +9,18 @@
 
 
 {% block admin_controls %}
-  <div class="mt-1 mb-4">
+  {% if perms.destination.can_change %}
+  <div class="mt-1 mb-2">
     <h3>Admin Controls</h3>
     <a href="{% url 'destination-edit' pk=destination.pk %}" class="btn btn-primary btn-block">Edit Page</a>
     <a href="{% url 'destination-delete' pk=destination.pk %}" class="btn btn-danger btn-block">Delete Page</a>
   </div>
+  {% endif %}
 {% endblock %}
 
 
 {% block detail_buttons %}
-  <div class="mb-3">
+  <div class="my-2">
     <a href="{{destination.google_maps_terrain_url}}" class="btn btn-secondary btn-block" target="_blank">Google Terrain</a>
     <a href="{{destination.google_maps_satellite_url}}" class="btn btn-secondary btn-block" target="_blank">Google Satellite</a>
     <a href="{{destination.caltopo_url}}" class="btn btn-secondary btn-block" target="_blank">CalTopo</a>
@@ -44,8 +46,8 @@
     {% endfor %}
   </ul>
 
+  <h4>Your Links</h4>
   <ul>
-    <h4>Your Links</h4>
     {% for pr_link in private_links %}
       <li><a href="{{pr_link.url}}" target="_blank">{{pr_link.label}}</a>
         (<a href="{{pr_link.get_edit_url}}">Edit</a>)

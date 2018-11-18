@@ -11,15 +11,15 @@
             </tr>
             <tr>
                 <th scope="row">Name:</td>
-                <td>{{user.get_full_name|default:"Update your profile to set your name"}}</td>
+                <td>{{user.get_full_name|default:"Update your profile to set your name."}}</td>
             </tr>
             <tr>
                 <th scope="row">Email:</td>
-                <td>{{user.email|default:"Update your profile to set your email"}}</td>
+                <td>{{user.email|default:"Update your profile to set your email. This needs to be set to recover your password."}}</td>
             </tr>
             <tr>
                 <th scope="row">Nearest City:</td>
-                <td>{{user.profile.nearest_city.name|default:"Update your profile to set the nearest major city to your current address"}}</td>
+                <td>{{user.profile.nearest_city.name|default:"Update your profile to set the nearest major city to your current address. This is necessary to use the 'Trip Planner' feature."}}</td>
             </tr>
             <tr>
                 <th scope="row">Street Address:</td>
@@ -28,7 +28,7 @@
                         {% if prof.street and prof.city and prof.state and prof.zip_code %}
                             <p>{{prof.street_line}}, {{prof.city_line}}</p>
                         {% else %}
-                            <p>Update your profile to set your current address.</p>
+                            <p>Update your profile to set your current address. This is required to produce an accurate drive time from your address to any specific trailhead.</p>
                         {% endif %}
                     {% endwith %}
                 </td>
