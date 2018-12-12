@@ -407,6 +407,10 @@ class Profile(models.Model):
         return "{0}, {1}, {2} {3}".format(self.street, self.city,
                                           self.state, self.zip_code)
 
+    @property
+    def is_address_defined(self):
+        return len(self.street + self.city + self.state + self.zip_code) > 0
+
     # ----- METADATA --------------------
     class Meta:
         pass

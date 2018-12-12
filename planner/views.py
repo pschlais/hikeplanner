@@ -344,6 +344,13 @@ class RouteDetailView(LoginRequiredMixin, generic.DetailView):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
 
+        # get Google Maps directions URL
+        origin = self.request.user.profile.full_address
+        destination = (str(self.object.trailhead.latitude) + ","
+                       + str(self.object.trailhead.longitude))
+
+        context['directions_external_url'] = constructURL.googleMapsDirectionsExternal(origin, destination)
+
         # call NOAA forecast API
         noaa_api_url = self.object.destination.noaa_api_url
         context['noaa_api_url'] = noaa_api_url

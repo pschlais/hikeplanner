@@ -82,7 +82,8 @@
 
       <tr>
         <th scope="row">Trailhead</th>
-        <td><a href="{{route.trailhead.get_absolute_url}}">{{route.trailhead.name}}</a><br>
+        <td><a href="{{route.trailhead.get_absolute_url}}">{{route.trailhead.name}}</a>
+          <br>
         {% if general_drive_flag %}
           ({{general_drive_dist|floatformat:"0"}} mi, {{general_drive_time}} from {{user.profile.nearest_city}})
         {% endif %}
@@ -100,6 +101,12 @@
       </tr>
     {% endwith %}
   </table>
+
+  {% if user.profile.is_address_defined %}
+    <a href="{{directions_external_url}}" class="btn btn-primary btn-block" target="_blank">Open Driving Directions</a>
+  {% else %}
+    <button class="btn btn-primary btn-block" disabled>Enter address in User Settings to enable driving directions</button>
+  {% endif %}
 {% endblock %}
 
 
