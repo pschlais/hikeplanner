@@ -1,8 +1,9 @@
-.row, .col, .col-2, .col-4, .col-6, .col-8, .col-10 {
-   /*border: 1px black solid;*/
-}
-
 .sidebar {
   border-right: 3px #a6a6a6 solid;
 }
+
+.text-attribution {
+  font-size: 0.5em;
+}
+
 

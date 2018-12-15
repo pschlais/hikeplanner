@@ -20,6 +20,7 @@ from .PlannerUtils import accessAPI
 from .PlannerUtils import parseAPI
 from .PlannerUtils import updateTable
 from .PlannerUtils import conversions
+from .PlannerUtils import quickAPI
 
 
 # Create your views here.
@@ -178,6 +179,13 @@ class DestinationDetailView(LoginRequiredMixin, generic.DetailView):
         weather_raw_data = accessAPI.NOAA_API(noaa_api_url)
         weather_data_by_day = parseAPI.NOAA_by_day(weather_raw_data)
         context['weather_by_day'] = weather_data_by_day
+
+        # # get sunrise and sunset times
+        # sunrise_api_url = constructURL.sunriseSunsetAPI(
+        #                     self.object.latitude, self.object.longitude)
+        # api_response = accessAPI.sunriseSunset_API(sunrise_api_url)
+        # context['sun_data'] = parseAPI.sunrise_sunset_properties(api_response)
+        context['sun_data'] = quickAPI.sunTimeData(self.object.latitude, self.object.longitude)
 
         # get links
         context['public_links'] = DestinationLink.objects.filter(owner_model=self.object, link_type=Link.PUBLIC)

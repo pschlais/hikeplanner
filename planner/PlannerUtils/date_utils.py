@@ -1,5 +1,5 @@
 """This module provides utilities for datetime operations"""
-from datetime import datetime
+from datetime import datetime, timedelta
 
 def ISO_to_datetime(iso_str, keep_UTC=False):
     """

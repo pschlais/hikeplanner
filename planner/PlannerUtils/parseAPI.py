@@ -1,5 +1,6 @@
 """This module provides utility functions to parse API outputs."""
 from . import date_utils
+from datetime import datetime,  timedelta
 import calendar
 
 
@@ -139,3 +140,41 @@ def NOAA_by_day(NOAAdict):
 
     # return data
     return return_array
+
+
+def sunrise_sunset_properties(apiObj):
+    """
+    Returns a simplified object with information for:
+    -first light & sunrise time
+    -sunset time & last light
+    """
+    returnObj = {}
+    returnObj["status"] = apiObj["status"]
+    returnObj["message"] = apiObj["message"]
+
+    if apiObj["status"] == "OK":
+        # reorganize/flatten data
+        returnObj["first_light"] = date_utils.ISO_to_datetime(apiObj["results"]["civil_twilight_begin"])
+        returnObj["last_light"] = date_utils.ISO_to_datetime(apiObj["results"]["civil_twilight_end"])
+        returnObj["sunrise"] = date_utils.ISO_to_datetime(apiObj["results"]["sunrise"])
+        returnObj["sunset"] = date_utils.ISO_to_datetime(apiObj["results"]["sunset"])
+        returnObj["day_length"] = apiObj["results"]["day_length"]
+
+    return returnObj
+
+
+def googleTimeZoneProperties(apiObj):
+
+    returnObj = {}
+    returnObj["status"] = apiObj["status"]
+    returnObj["message"] = ""
+
+    if apiObj["status"] == "OK":
+        returnObj["dstOffset"] = timedelta(0, int(apiObj["dstOffset"]))
+        returnObj["utcOffset"] = timedelta(0, int(apiObj["rawOffset"]))
+        returnObj["timezone"] = apiObj["timeZoneName"]
+    else:
+        returnObj["message"] = "Time zone data could not be read."
+        returnObj["errorMessage"] = apiObj.get("errorMessage", None)
+
+    return returnObj

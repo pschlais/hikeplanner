@@ -2,7 +2,9 @@
 This module provides functions to construct various URLs for buttons/links
 """
 import urllib.parse
+from requests import Request
 import os
+from datetime import datetime
 
 
 def validLatLon(lat=None, lon=None):
@@ -257,6 +259,46 @@ def googleMapsDistanceAPI(origins, destinations):
     return base_url + urllib.parse.urlencode(params)
 
 
+def googleTimeZoneAPI(latitude, longitude, ref_date=None):
+    """
+    Builds a URL for Google Maps Time Zone API.
+    https://developers.google.com/maps/documentation/timezone/intro
+
+    Parameters
+    ----------------
+    latitude : float
+        Latitude of the point
+    longitude : float
+        Longitude of the point
+    ref_date : datetime [OPTIONAL]
+        Date on which to calculate the time zone (takes into account daylight savings time)
+
+    Returns
+    ----------------
+    string
+        URL for API GET request
+    """
+    base_url = "https://maps.googleapis.com/maps/api/timezone/json"
+
+    if not ref_date:
+        calc_date = datetime.today()
+    else:
+        calc_date = ref_date
+
+    # calculate amount of seconds from the reference date (Jan 1 1970, 12AM)
+    # to the date to calculate the time zone
+    base_date = datetime(1970, 1, 1, 0, 0, 0)
+    dt_date = calc_date - base_date
+
+    params = {
+        'location': str(latitude) + "," + str(longitude),
+        'timestamp': int(dt_date.total_seconds()),
+        'key': os.environ.get("HIKEPLANNER_GOOGLE_TIME_ZONE_API_KEY"),
+    }
+
+    return Request('GET', base_url, params=params).prepare().url
+
+
 def buildCalTopoURL(latitude, longitude):
     """
     Builds a URL for CalTopo.
@@ -351,3 +393,30 @@ def buildNOAAapiURL(latitude, longitude):
     #                   + "," + str(longitude))
 
     return NOAA_API_URL
+
+
+def sunriseSunsetAPI(latitude, longitude, date=None):
+    """
+    builds API URL for https://api.sunrise-sunset.org
+
+    latitude: float, decimal degrees
+    longitude: float, decimal degrees
+    date: datetime.datetime object (optional). Defaults to today.
+    callback: string, callback function name for JSONP response. Optional.
+    formatted: 0 or 1 (default). Response format.
+    """
+    params = {
+        'lat': latitude,
+        'lng': longitude,
+        'formatted': 0,
+    }
+
+    if date:
+        # YYYY-MM-DD format
+        params['date'] = date.strftime("%Y-%m-%d")
+
+    # create url
+    base_url = "https://api.sunrise-sunset.org/json"
+    return Request('GET', base_url, params=params).prepare().url
+
+
