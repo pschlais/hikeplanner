@@ -34,6 +34,8 @@ def sunTimeData(lat, lon, date=None):
         for key in adj_list:
             returnObj[key] += (tzAPIdata["dstOffset"] + tzAPIdata["utcOffset"])
 
+        # add time zone string to object
+        returnObj ["timezone"] = tzAPIdata["timezone"]
         # return data
         return returnObj
 

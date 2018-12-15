@@ -140,6 +140,7 @@
           <li class="text-muted">Last Light: {{sun_data.last_light|time}}</li>
         </ul>
 
+        <p class="text-muted text-attribution">Local times shown ({{sun_data.timezone}})</p>
         <p class="text-muted text-attribution">Time data provided by: <a href="https://sunrise-sunset.org">sunrise-sunset.org</a></p>
       {% else %}
         <div class="alert alert-warning">Sun cycle data is not available.<br>{{sun_data.message}}</div>
