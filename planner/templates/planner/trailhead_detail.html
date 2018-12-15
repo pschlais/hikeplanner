@@ -2,7 +2,7 @@
 
 {% load static %}
 
-
+{% load planner_timeconvert %}
 
 {% block stylesheets %}
   {{block.super}}
@@ -105,11 +105,31 @@
 
 
 {% block detail_below_fold %}
-  <div class="row mt-3">
-    <section class="col th-weather">
-      <h2>Weather</h2>
+
+  <h2>Weather</h2>
+  <div class="row my-3">
+    <div class="col-sm-auto border">
+      <h3>Today's Cycle</h3>
+      {% if sun_data.status == "OK" %}
+        <ul class="list-unstyled">
+          <li>Sunrise: {{sun_data.sunrise|time}}</li>
+          <li>Sunset: {{sun_data.sunset|time}}</li>
+          <li>Total daylight: {{sun_data.day_length|sec_to_hour_min_trunc:"hour"}} hr {{sun_data.day_length|sec_to_hour_min_trunc:"min"}} min</li>
+          <li class="text-muted">First Light: {{sun_data.first_light|time}}</li>
+          <li class="text-muted">Last Light: {{sun_data.last_light|time}}</li>
+        </ul>
+
+        <p class="text-muted text-attribution">Local times shown ({{sun_data.timezone}})</p>
+        <p class="text-muted text-attribution">Time data provided by: <a href="https://sunrise-sunset.org">sunrise-sunset.org</a></p>
+      {% else %}
+        <div class="alert alert-warning">Sun cycle data is not available.<br>{{sun_data.message}}</div>
+      {% endif %}
+    </div>
+
+    <div class="col th-weather border" noaa-api-url="{{noaa_api_url}}">
+      <h3>Forecast</h3>
       {% include "planner/_weather_tabs.html" with weather_by_day=weather_by_day %}
-    </section>
+    </div>
   </div>
 
 

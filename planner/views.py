@@ -180,11 +180,7 @@ class DestinationDetailView(LoginRequiredMixin, generic.DetailView):
         weather_data_by_day = parseAPI.NOAA_by_day(weather_raw_data)
         context['weather_by_day'] = weather_data_by_day
 
-        # # get sunrise and sunset times
-        # sunrise_api_url = constructURL.sunriseSunsetAPI(
-        #                     self.object.latitude, self.object.longitude)
-        # api_response = accessAPI.sunriseSunset_API(sunrise_api_url)
-        # context['sun_data'] = parseAPI.sunrise_sunset_properties(api_response)
+        # get sunrise and sunset times
         context['sun_data'] = quickAPI.sunTimeData(self.object.latitude, self.object.longitude)
 
         # get links
@@ -352,6 +348,9 @@ class RouteDetailView(LoginRequiredMixin, generic.DetailView):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
 
+        # get sunrise and sunset times
+        context['sun_data'] = quickAPI.sunTimeData(self.object.destination.latitude, self.object.destination.longitude)
+
         # get Google Maps directions URL
         origin = self.request.user.profile.full_address
         destination = (str(self.object.trailhead.latitude) + ","
@@ -443,6 +442,9 @@ class TrailheadDetailView(LoginRequiredMixin, generic.DetailView):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
 
+        # get sunrise and sunset times
+        context['sun_data'] = quickAPI.sunTimeData(self.object.latitude, self.object.longitude)
+
         # get Google Maps directions URL
         origin = self.request.user.profile.full_address
         destination = str(self.object.latitude) + "," + str(self.object.longitude)
@@ -488,9 +490,6 @@ class TrailheadDetailView(LoginRequiredMixin, generic.DetailView):
         weather_raw_data = accessAPI.NOAA_API(noaa_api_url)
         weather_data_by_day = parseAPI.NOAA_by_day(weather_raw_data)
         context['weather_by_day'] = weather_data_by_day
-
-        # weather_data = weather_raw_data["properties"]["periods"][0]
-        # context['noaa_weather_data'] = weather_data
 
         return context
 
