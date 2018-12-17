@@ -3,7 +3,7 @@
 {% load planner_timeconvert %}
 
 {% block admin_controls %}
-  {% if perms.route.can_change %}
+  {% if perms.planner.change_route %}
   <div class="mt-1 mb-2">
     <h3>Admin Controls</h3>
     <a href="{% url 'route-edit' pk=route.pk %}" class="btn btn-primary btn-block">Edit Page</a>
@@ -31,7 +31,7 @@
   <ul>
     {% for pub_link in public_links %}
       <li><a href="{{pub_link.url}}" target="_blank">{{pub_link.label}}</a>
-        {% if perms.can_edit_routelink %}
+        {% if perms.planner.change_routelink %}
           (<a href="{{pub_link.get_edit_url}}">Edit</a>)
           (<a href="{{pub_link.get_delete_url}}">X</a>)
         {% endif %}

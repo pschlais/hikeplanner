@@ -4,7 +4,7 @@
 
 <h1>Destinations ({{destination_list | length}})</h1>
 <p>
-  {% if perms.destination.can_add %}
+  {% if perms.planner.add_destination %}
     <a href="{% url 'destination-add-combo' %}" class="btn btn-primary">Add New Destination</a>
   {% endif %}
   <a href="{% url 'destination-search' %}" class="btn btn-primary">Trip Finder</a>

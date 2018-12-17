@@ -4,7 +4,7 @@
   {% include "planner/_nav_header.html" %}
   <h1>Trailheads ({{trailhead_list | length}})</h1>
   <p>
-    {% if perms.trailhead.can_add %}
+    {% if perms.planner.add_trailhead %}
       <a href="{% url 'trailhead-add' %}" class="btn btn-primary">Add New Trailhead</a>
     {% endif %}
   </p>

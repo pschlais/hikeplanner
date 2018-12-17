@@ -11,7 +11,7 @@
 
 
 {% block admin_controls %}
-  {% if perms.trailhead.can_change %}
+  {% if perms.planner.change_trailhead %}
   <div class="mt-1 mb-2">
     <h3>Admin Controls</h3>
     <a href="{% url 'trailhead-edit' pk=trailhead.pk %}" class="btn btn-primary btn-block">Edit Page</a>
